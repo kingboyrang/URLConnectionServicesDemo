@@ -41,6 +41,10 @@
 + (id)requestWithArgs:(ServiceArgs*)args{
     return [[[self alloc] initWithArgs:args] autorelease];
 }
++ (id)requestWithName:(NSString *)methodName{
+    ServiceArgs *args=[ServiceArgs serviceMethodName:methodName];
+    return [[[self alloc] initWithArgs:args] autorelease];
+}
 - (void)setFinishBlock:(requestFinishBlock)afinishBlock{
     if (_finishBlock!=afinishBlock) {
         [_finishBlock release];

@@ -21,6 +21,7 @@ typedef void (^requestSuccessBlock)(ServiceRequestResult *result,NSError *error)
 @property (readwrite, nonatomic, copy) requestSuccessBlock successBlock;
 + (id)requestWithRequest:(NSURLRequest*)request;
 + (id)requestWithArgs:(ServiceArgs*)args;
++ (id)requestWithName:(NSString*)methodName;
 - (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithArgs:(ServiceArgs*)args;
 - (void)setFinishBlock:(requestFinishBlock)afinishBlock;
