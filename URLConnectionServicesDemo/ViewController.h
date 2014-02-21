@@ -9,5 +9,9 @@
 #import <UIKit/UIKit.h>
 
 @interface ViewController : UIViewController
+//同步请求
+- (IBAction)buttonSyncClick:(id)sender;
+//异步请求
+- (IBAction)buttonAsyncClick:(id)sender;
 
 @end
