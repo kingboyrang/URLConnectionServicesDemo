@@ -17,7 +17,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	//使用说明，请查看＝＝＝＝》使用说明.rtf
+	//==================>使用说明，请查看＝＝＝＝》使用说明.rtf
 }
 
 - (void)didReceiveMemoryWarning
