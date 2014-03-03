@@ -9,7 +9,6 @@
 #import "NSURLConnectionManager.h"
 
 @interface NSURLConnectionManager ()
-
 @property (nonatomic,retain) NSMutableData *receiveData;
 - (NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName;
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
@@ -88,7 +87,9 @@
             if (error) {
                 self.responseString=@"";
             }else{
-                self.responseString=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                NSString *xml=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                self.responseString=xml;
+                [xml release];
             }
             self.error=error;
             if (self.successBlock) {
