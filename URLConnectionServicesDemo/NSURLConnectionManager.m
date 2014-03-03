@@ -10,7 +10,6 @@
 
 @interface NSURLConnectionManager ()
 @property (nonatomic,retain) NSMutableData *receiveData;
-- (NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName;
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
 @end
 
@@ -136,14 +135,8 @@
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args{
     
     NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:args.webURL];
-    NSString *msgLength = [NSString stringWithFormat:@"%d", [args.soapMessage length]];
-    NSString *soapAction=[self soapAction:args.serviceNameSpace methodName:args.methodName];
     //头部设置
-    NSDictionary *headField=[NSDictionary dictionaryWithObjectsAndKeys:[args.webURL host],@"Host",
-                             @"text/xml; charset=utf-8",@"Content-Type",
-                             msgLength,@"Content-Length",
-                             soapAction,@"SOAPAction",nil];
-    [request setAllHTTPHeaderFields:headField];
+    [request setAllHTTPHeaderFields:[args headers]];
     //超时设置
     [request setTimeoutInterval: 30 ];
     //访问方式
@@ -151,14 +144,5 @@
     //body内容
     [request setHTTPBody:[args.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
     return request;
-}
--(NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName{
-    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"/$" options:0 error:nil];
-    NSUInteger numberOfMatches = [regex numberOfMatchesInString:namespace options:0 range:NSMakeRange(0, [namespace length])];
-    //NSArray *array=[regex matchesInString:namespace options:0 range:NSMakeRange(0, [namespace length])];
-    if(numberOfMatches>0){
-        return [NSString stringWithFormat:@"%@%@",namespace,methodName];
-    }
-    return [NSString stringWithFormat:@"%@/%@",namespace,methodName];
 }
 @end

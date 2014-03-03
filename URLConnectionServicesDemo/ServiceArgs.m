@@ -10,17 +10,13 @@
 
 @interface ServiceArgs()
 -(NSString*)paramsFormatString:(NSArray*)params;
+-(NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName;
 @end
 
 static NSString *defaultWebServiceUrl=@"http://webservice.webxml.com.cn/webservices/qqOnlineWebService.asmx";
 static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
 
 @implementation ServiceArgs
-@synthesize serviceURL,serviceNameSpace;
-@synthesize methodName,soapMessage;
-@synthesize webURL,headers,defaultSoapMesage;
-@synthesize soapParams;
-
 
 +(void)setWebServiceURL:(NSString*)url
 {
@@ -49,42 +45,31 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     return [NSURL URLWithString:[self serviceURL]];
 }
 -(NSString*)serviceURL{
-    if (serviceURL) {
-        return serviceURL;
+    if (_serviceURL&&[_serviceURL length]>0) {
+        return _serviceURL;
     }
     return defaultWebServiceUrl;
 }
 -(NSString*)serviceNameSpace{
-    if (serviceNameSpace) {
-        return serviceNameSpace;
+    if (_serviceNameSpace&&[_serviceNameSpace length]>0) {
+        return _serviceNameSpace;
     }
     return defaultWebServiceNameSpace;
 }
 -(NSString*)soapMessage{
-    if (soapMessage) {
-        return soapMessage;
+    if (_soapMessage&&[_soapMessage length]>0) {
+        return _soapMessage;
     }
     return [self stringSoapMessage:[self soapParams]];
 }
--(NSMutableDictionary*)headers{
+-(NSDictionary*)headers{
+    NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[[self webURL] host] forKey:@"Host"];
     [dic setValue:@"text/xml; charset=utf-8" forKey:@"Content-Type"];
     [dic setValue:[NSString stringWithFormat:@"%d",[[self soapMessage] length]] forKey:@"Content-Length"];
-    [dic setValue:[NSString stringWithFormat:@"%@%@",[self serviceNameSpace],[self methodName]] forKey:@"SOAPAction"];
+    [dic setValue:soapAction forKey:@"SOAPAction"];
     return dic;
-}
-#pragma mark -
-#pragma mark 私有方法
--(NSString*)paramsFormatString:(NSArray*)params{
-    NSMutableString *xml=[NSMutableString stringWithFormat:@""];
-    for (NSDictionary *item in params) {
-        NSString *key=[[item allKeys] objectAtIndex:0];
-        [xml appendFormat:@"<%@>",key];
-        [xml appendString:[item objectForKey:key]];
-        [xml appendFormat:@"</%@>",key];
-    }
-    return xml;
 }
 #pragma mark -
 #pragma mark 公有方法
@@ -112,5 +97,26 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
         args.soapMessage=[args stringSoapMessage:nil];
     }
     return args;
+}
+#pragma mark -
+#pragma mark 私有方法
+-(NSString*)paramsFormatString:(NSArray*)params{
+    NSMutableString *xml=[NSMutableString stringWithFormat:@""];
+    for (NSDictionary *item in params) {
+        NSString *key=[[item allKeys] objectAtIndex:0];
+        [xml appendFormat:@"<%@>",key];
+        [xml appendString:[item objectForKey:key]];
+        [xml appendFormat:@"</%@>",key];
+    }
+    return xml;
+}
+-(NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName{
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"/$" options:0 error:nil];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:namespace options:0 range:NSMakeRange(0, [namespace length])];
+    //NSArray *array=[regex matchesInString:namespace options:0 range:NSMakeRange(0, [namespace length])];
+    if(numberOfMatches>0){
+        return [NSString stringWithFormat:@"%@%@",namespace,methodName];
+    }
+    return [NSString stringWithFormat:@"%@/%@",namespace,methodName];
 }
 @end
