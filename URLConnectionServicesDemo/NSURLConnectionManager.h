@@ -8,14 +8,16 @@
 
 #import <Foundation/Foundation.h>
 #import "ServiceArgs.h"
-#import "ServiceRequestResult.h"
+
 //block
-typedef void (^requestFinishBlock)(ServiceRequestResult *result);
-typedef void (^requestFailedBlock)(ServiceRequestResult *result,NSError *error);
-typedef void (^requestSuccessBlock)(ServiceRequestResult *result,NSError *error);
+typedef void (^requestFinishBlock)();
+typedef void (^requestFailedBlock)();
+typedef void (^requestSuccessBlock)();
 
 @interface NSURLConnectionManager : NSURLConnection<NSURLConnectionDelegate>
-@property (nonatomic,retain) NSDictionary *userInfo;
+@property (nonatomic,retain) NSURLRequest *request;
+@property (nonatomic,copy) NSString *responseString;
+@property (nonatomic,retain) NSError *error;
 @property (readwrite, nonatomic, copy) requestFinishBlock finishBlock;
 @property (readwrite, nonatomic, copy) requestFailedBlock failedBlock;
 @property (readwrite, nonatomic, copy) requestSuccessBlock successBlock;
@@ -27,7 +29,7 @@ typedef void (^requestSuccessBlock)(ServiceRequestResult *result,NSError *error)
 - (void)setFinishBlock:(requestFinishBlock)afinishBlock;
 - (void)setFailedBlock:(requestFailedBlock)afailedBlock;
 - (void)setSuccessBlock:(requestSuccessBlock)asuccessBlock;
-- (NSURLRequest*)requestWithArgs:(ServiceArgs*)args;
+
 //同步请求
 - (void)startSynchronous;
 //开始异步请求

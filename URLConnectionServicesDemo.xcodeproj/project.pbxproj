@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		01583A1D18B731200054FFC6 /* 使用说明.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 01583A1C18B731200054FFC6 /* 使用说明.rtf */; };
+		0110088318C4349F00112E46 /* 使用说明v1.0.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 0110088218C4349F00112E46 /* 使用说明v1.0.rtf */; };
 		01B0991918B726E1003A09D9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01B0991818B726E1003A09D9 /* UIKit.framework */; };
 		01B0991B18B726E1003A09D9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01B0991A18B726E1003A09D9 /* Foundation.framework */; };
 		01B0991D18B726E1003A09D9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01B0991C18B726E1003A09D9 /* CoreGraphics.framework */; };
@@ -20,12 +20,11 @@
 		01B0993218B726E2003A09D9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0993118B726E2003A09D9 /* ViewController.m */; };
 		01B0993518B726E2003A09D9 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01B0993318B726E2003A09D9 /* ViewController.xib */; };
 		01B0994218B72714003A09D9 /* ServiceArgs.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0993D18B72714003A09D9 /* ServiceArgs.m */; };
-		01B0994318B72714003A09D9 /* ServiceRequestResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0993F18B72714003A09D9 /* ServiceRequestResult.m */; };
 		01B0994418B72714003A09D9 /* NSURLConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0994118B72714003A09D9 /* NSURLConnectionManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		01583A1C18B731200054FFC6 /* 使用说明.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "使用说明.rtf"; sourceTree = "<group>"; };
+		0110088218C4349F00112E46 /* 使用说明v1.0.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "使用说明v1.0.rtf"; sourceTree = "<group>"; };
 		01B0991518B726E1003A09D9 /* URLConnectionServicesDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = URLConnectionServicesDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		01B0991818B726E1003A09D9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		01B0991A18B726E1003A09D9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -44,8 +43,6 @@
 		01B0993418B726E2003A09D9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		01B0993C18B72714003A09D9 /* ServiceArgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceArgs.h; sourceTree = "<group>"; };
 		01B0993D18B72714003A09D9 /* ServiceArgs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceArgs.m; sourceTree = "<group>"; };
-		01B0993E18B72714003A09D9 /* ServiceRequestResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceRequestResult.h; sourceTree = "<group>"; };
-		01B0993F18B72714003A09D9 /* ServiceRequestResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceRequestResult.m; sourceTree = "<group>"; };
 		01B0994018B72714003A09D9 /* NSURLConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSURLConnectionManager.h; sourceTree = "<group>"; };
 		01B0994118B72714003A09D9 /* NSURLConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSURLConnectionManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +91,7 @@
 		01B0991E18B726E1003A09D9 /* URLConnectionServicesDemo */ = {
 			isa = PBXGroup;
 			children = (
-				01583A1C18B731200054FFC6 /* 使用说明.rtf */,
+				0110088218C4349F00112E46 /* 使用说明v1.0.rtf */,
 				01B0993B18B72707003A09D9 /* Class */,
 				01B0992718B726E2003A09D9 /* AppDelegate.h */,
 				01B0992818B726E2003A09D9 /* AppDelegate.m */,
@@ -125,8 +122,6 @@
 			children = (
 				01B0993C18B72714003A09D9 /* ServiceArgs.h */,
 				01B0993D18B72714003A09D9 /* ServiceArgs.m */,
-				01B0993E18B72714003A09D9 /* ServiceRequestResult.h */,
-				01B0993F18B72714003A09D9 /* ServiceRequestResult.m */,
 				01B0994018B72714003A09D9 /* NSURLConnectionManager.h */,
 				01B0994118B72714003A09D9 /* NSURLConnectionManager.m */,
 			);
@@ -189,7 +184,7 @@
 				01B0992D18B726E2003A09D9 /* Default@2x.png in Resources */,
 				01B0992F18B726E2003A09D9 /* Default-568h@2x.png in Resources */,
 				01B0993518B726E2003A09D9 /* ViewController.xib in Resources */,
-				01583A1D18B731200054FFC6 /* 使用说明.rtf in Resources */,
+				0110088318C4349F00112E46 /* 使用说明v1.0.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,7 +199,6 @@
 				01B0992918B726E2003A09D9 /* AppDelegate.m in Sources */,
 				01B0993218B726E2003A09D9 /* ViewController.m in Sources */,
 				01B0994218B72714003A09D9 /* ServiceArgs.m in Sources */,
-				01B0994318B72714003A09D9 /* ServiceRequestResult.m in Sources */,
 				01B0994418B72714003A09D9 /* NSURLConnectionManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

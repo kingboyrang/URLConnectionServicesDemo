@@ -17,7 +17,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	//==================>使用说明，请查看＝＝＝＝》使用说明.rtf
+	//==================>使用说明，请查看＝＝＝＝》使用说明v1.0.rtf
 }
 
 - (void)didReceiveMemoryWarning
@@ -36,12 +36,12 @@
     args.soapParams=params;//传递方法参数
     
     NSURLConnectionManager *manager=[NSURLConnectionManager requestWithArgs:args];
-    [manager setSuccessBlock:^(ServiceRequestResult *result, NSError *error) {
-        if (error) {
-            NSLog(@"同步请求失败，失败原因=%@",error.description);
+    [manager setSuccessBlock:^() {
+        if (manager.error) {
+            NSLog(@"同步请求失败，失败原因=%@",manager.error.description);
             return;
         }
-        NSLog(@"同步请求成功，请求结果为=%@",result.xmlString);
+        NSLog(@"同步请求成功，请求结果为=%@",manager.responseString);
     }];
     [manager startSynchronous];//开始同步
 }
@@ -56,11 +56,11 @@
     args.soapParams=params;//传递方法参数
     
     NSURLConnectionManager *manager=[NSURLConnectionManager requestWithArgs:args];
-    [manager setFinishBlock:^(ServiceRequestResult *result) {
-        NSLog(@"异步请求成功，请求结果为=%@",result.xmlString);
+    [manager setFinishBlock:^() {
+        NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
     }];
-    [manager setFailedBlock:^(ServiceRequestResult *result, NSError *error) {
-         NSLog(@"异步请求失败，失败原因=%@",error.description);
+    [manager setFailedBlock:^() {
+         NSLog(@"异步请求失败，失败原因=%@",manager.error.description);
     }];
     [manager startAsynchronous];//开始异步
 }
