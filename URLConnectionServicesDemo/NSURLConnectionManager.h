@@ -17,6 +17,8 @@ typedef void (^requestSuccessBlock)();
 @interface NSURLConnectionManager : NSURLConnection<NSURLConnectionDelegate>
 @property (nonatomic,retain) NSURLRequest *request;
 @property (nonatomic,copy) NSString *responseString;
+@property (nonatomic,retain) NSMutableData *responseData;
+@property (nonatomic,assign) int responseStatusCode;
 @property (nonatomic,retain) NSError *error;
 @property (readwrite, nonatomic, copy) requestFinishBlock finishBlock;
 @property (readwrite, nonatomic, copy) requestFailedBlock failedBlock;

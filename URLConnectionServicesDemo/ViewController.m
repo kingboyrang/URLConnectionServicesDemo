@@ -38,6 +38,7 @@
     NSURLConnectionManager *manager=[NSURLConnectionManager requestWithArgs:args];
     [manager setSuccessBlock:^() {
         if (manager.error) {
+            NSLog(@"请求状态=%d",manager.responseStatusCode);
             NSLog(@"同步请求失败，失败原因=%@",manager.error.description);
             return;
         }
@@ -57,6 +58,7 @@
     
     NSURLConnectionManager *manager=[NSURLConnectionManager requestWithArgs:args];
     [manager setFinishBlock:^() {
+        NSLog(@"请求状态=%d",manager.responseStatusCode);
         NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
     }];
     [manager setFailedBlock:^() {

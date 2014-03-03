@@ -9,14 +9,23 @@
 #import "NSURLConnectionManager.h"
 
 @interface NSURLConnectionManager ()
-@property (nonatomic,retain) NSMutableData *receiveData;
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
+- (void)showNetworkActivityIndicator;
+- (void)hideNetworkActivityIndicator;
 @end
 
 @implementation NSURLConnectionManager
 -(void)dealloc{
     [self cancel];
 	[super dealloc];
+}
+- (id)init{
+    if (self=[super init]) {
+        self.error=nil;
+        self.responseString=@"";
+        self.responseStatusCode=100;
+    }
+    return self;
 }
 - (id)initWithRequest:(NSURLRequest*)request{
     if (self=[super init]) {
@@ -60,12 +69,10 @@
 }
 
 - (void)startAsynchronous{
-    if (!self.receiveData) {
-        self.receiveData=[NSMutableData data];
+    if (!self.responseData) {
+        self.responseData=[NSMutableData data];
     }
-    if (_receiveData) {
-        [_receiveData setLength:0];
-    }
+    [self.responseData setLength:0];
     if (self.request) {
         [self cancel];//取消前一次请求
         NSURLConnection *conn=[[self class] connectionWithRequest:self.request delegate:self];
@@ -76,10 +83,14 @@
     }
 }
 - (void)startSynchronous{
+    if (!self.responseData) {
+        self.responseData=[NSMutableData data];
+    }
+    [self.responseData setLength:0];
     if (self.request) {
        [self cancel];//取消前一次请求
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSURLResponse *response=nil;
+            NSHTTPURLResponse *response=nil;
             NSError *error=nil;
             NSData *data=[[self class] sendSynchronousRequest:self.request returningResponse:&response error:&error];
             //请求完成
@@ -91,6 +102,8 @@
                 [xml release];
             }
             self.error=error;
+            self.responseStatusCode=[response statusCode];
+            [self.responseData appendData:data];
             if (self.successBlock) {
                 self.successBlock();
             }
@@ -100,27 +113,33 @@
 #pragma mark -
 #pragma mark NSURLConnection delegate Methods
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
+    [self showNetworkActivityIndicator];
     // store data
-    [_receiveData setLength:0];      //通常在这里先清空接受数据的缓存
+    [self.responseData setLength:0];      //通常在这里先清空接受数据的缓存
+    
+    NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+    self.responseStatusCode=[httpResponse statusCode];
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [_receiveData appendData:data];    //可能多次收到数据，把新的数据添加在现有数据最后
+    [self.responseData appendData:data];    //可能多次收到数据，把新的数据添加在现有数据最后
+   
 }
 - (void)connection:(NSURLConnection *)connection
   didFailWithError:(NSError *)error
 {
+    [self hideNetworkActivityIndicator];
     self.error=error;
     self.responseString=@"";
     if (self.failedBlock) {
         self.failedBlock();
     }
-    //[connection cancel];
     connection=nil;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
-    NSString *xml=[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding];
+    [self hideNetworkActivityIndicator];
+    NSString *xml=[[NSString alloc] initWithData:self.responseData encoding:NSUTF8StringEncoding];
     self.responseString=xml;
     [xml release];
     self.error=nil;
@@ -129,7 +148,6 @@
         self.finishBlock();
     }
     connection=nil;
-    //[_receiveData setLength:0];//清空
 }
 #pragma mark -private Methods
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args{
@@ -138,11 +156,19 @@
     //头部设置
     [request setAllHTTPHeaderFields:[args headers]];
     //超时设置
-    [request setTimeoutInterval: 30 ];
+    [request setTimeoutInterval:30];
     //访问方式
     [request setHTTPMethod:@"POST"];
     //body内容
     [request setHTTPBody:[args.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
     return request;
+}
+- (void)showNetworkActivityIndicator
+{
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+}
+- (void)hideNetworkActivityIndicator
+{
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 @end
