@@ -9,14 +9,19 @@
 #import "NSURLConnectionManager.h"
 
 @interface NSURLConnectionManager ()
+@property (nonatomic,retain) NSURLConnection *connection;
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
 - (void)showNetworkActivityIndicator;
 - (void)hideNetworkActivityIndicator;
+- (void)clearAndDelegate;
 @end
 
 @implementation NSURLConnectionManager
 -(void)dealloc{
-    [self cancel];
+    if (self.connection) {
+        [self.connection cancel];
+        [self.connection release],self.connection=nil;
+    }
 	[super dealloc];
 }
 - (id)init{
@@ -67,19 +72,16 @@
         _successBlock=[asuccessBlock copy];
     }
 }
-
 - (void)startAsynchronous{
     if (!self.responseData) {
         self.responseData=[NSMutableData data];
     }
     [self.responseData setLength:0];
     if (self.request) {
-        [self cancel];//取消前一次请求
-        NSURLConnection *conn=[[self class] connectionWithRequest:self.request delegate:self];
-        //[[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:YES];
-        if (conn) {
-            
-        }
+        [self clearAndDelegate];//取消前一次请求
+        self.connection=[[NSURLConnection alloc] initWithRequest:self.request delegate:self];
+        [self.connection start];
+        [self showNetworkActivityIndicator];
     }
 }
 - (void)startSynchronous{
@@ -88,11 +90,12 @@
     }
     [self.responseData setLength:0];
     if (self.request) {
-       [self cancel];//取消前一次请求
+        [self clearAndDelegate];//取消前一次请求
+        [self showNetworkActivityIndicator];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             NSHTTPURLResponse *response=nil;
             NSError *error=nil;
-            NSData *data=[[self class] sendSynchronousRequest:self.request returningResponse:&response error:&error];
+            NSData *data=[NSURLConnection sendSynchronousRequest:self.request returningResponse:&response error:&error];
             //请求完成
             if (error) {
                 self.responseString=@"";
@@ -105,6 +108,7 @@
             self.responseStatusCode=[response statusCode];
             [self.responseData appendData:data];
             if (self.successBlock) {
+                [self hideNetworkActivityIndicator];
                 self.successBlock();
             }
         });
@@ -112,8 +116,8 @@
 }
 #pragma mark -
 #pragma mark NSURLConnection delegate Methods
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    [self showNetworkActivityIndicator];
+- (void)connection:(NSURLConnection *)con didReceiveResponse:(NSURLResponse *)response {
+    
     // store data
     [self.responseData setLength:0];      //通常在这里先清空接受数据的缓存
     
@@ -121,11 +125,11 @@
     self.responseStatusCode=[httpResponse statusCode];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
+- (void)connection:(NSURLConnection *)con didReceiveData:(NSData *)data {
     [self.responseData appendData:data];    //可能多次收到数据，把新的数据添加在现有数据最后
    
 }
-- (void)connection:(NSURLConnection *)connection
+- (void)connection:(NSURLConnection *)con
   didFailWithError:(NSError *)error
 {
     [self hideNetworkActivityIndicator];
@@ -134,9 +138,9 @@
     if (self.failedBlock) {
         self.failedBlock();
     }
-    connection=nil;
+    [self clearAndDelegate];
 }
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+- (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
     [self hideNetworkActivityIndicator];
     NSString *xml=[[NSString alloc] initWithData:self.responseData encoding:NSUTF8StringEncoding];
@@ -147,16 +151,22 @@
     {
         self.finishBlock();
     }
-    connection=nil;
+    [self clearAndDelegate];
 }
 #pragma mark -private Methods
+- (void)clearAndDelegate{
+    if (self.connection) {
+        [self.connection cancel];
+        [self.connection release],self.connection=nil;
+    }
+}
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args{
     
     NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:args.webURL];
     //头部设置
     [request setAllHTTPHeaderFields:[args headers]];
     //超时设置
-    [request setTimeoutInterval:30];
+    [request setTimeoutInterval:60];
     //访问方式
     [request setHTTPMethod:@"POST"];
     //body内容

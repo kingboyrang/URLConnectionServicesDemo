@@ -14,7 +14,7 @@ typedef void (^requestFinishBlock)();
 typedef void (^requestFailedBlock)();
 typedef void (^requestSuccessBlock)();
 
-@interface NSURLConnectionManager : NSURLConnection<NSURLConnectionDelegate>
+@interface NSURLConnectionManager : NSObject<NSURLConnectionDelegate>
 @property (nonatomic,retain) NSURLRequest *request;
 @property (nonatomic,copy) NSString *responseString;//请求返回字符串
 @property (nonatomic,retain) NSMutableData *responseData;//请求返回数据
