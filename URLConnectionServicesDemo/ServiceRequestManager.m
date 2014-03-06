@@ -6,9 +6,9 @@
 //  Copyright (c) 2014年 rang. All rights reserved.
 //
 
-#import "NSURLConnectionManager.h"
+#import "ServiceRequestManager.h"
 
-@interface NSURLConnectionManager ()
+@interface ServiceRequestManager ()
 @property (nonatomic,retain) NSURLConnection *connection;
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
 - (void)showNetworkActivityIndicator;
@@ -16,7 +16,7 @@
 - (void)clearAndDelegate;
 @end
 
-@implementation NSURLConnectionManager
+@implementation ServiceRequestManager
 -(void)dealloc{
     if (self.connection) {
         [self.connection cancel];

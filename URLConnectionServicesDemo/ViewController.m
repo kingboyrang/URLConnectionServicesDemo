@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "NSURLConnectionManager.h"
+#import "ServiceRequestManager.h"
 @interface ViewController ()
 
 @end
@@ -36,7 +36,7 @@
     args.methodName=@"qqCheckOnline";//要调用的webservice方法
     args.soapParams=params;//传递方法参数
     
-    NSURLConnectionManager *manager=[NSURLConnectionManager requestWithArgs:args];
+    ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
     [manager setSuccessBlock:^() {
         if (manager.error) {
            
@@ -58,7 +58,7 @@
     args.methodName=@"qqCheckOnline";//要调用的webservice方法
     args.soapParams=params;//传递方法参数
     
-    NSURLConnectionManager *manager=[NSURLConnectionManager requestWithArgs:args];
+    ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
     [manager setFinishBlock:^() {
         NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
     }];

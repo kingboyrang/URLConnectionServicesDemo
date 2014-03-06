@@ -20,7 +20,7 @@
 		01B0993218B726E2003A09D9 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0993118B726E2003A09D9 /* ViewController.m */; };
 		01B0993518B726E2003A09D9 /* ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 01B0993318B726E2003A09D9 /* ViewController.xib */; };
 		01B0994218B72714003A09D9 /* ServiceArgs.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0993D18B72714003A09D9 /* ServiceArgs.m */; };
-		01B0994418B72714003A09D9 /* NSURLConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0994118B72714003A09D9 /* NSURLConnectionManager.m */; };
+		01B0994418B72714003A09D9 /* ServiceRequestManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B0994118B72714003A09D9 /* ServiceRequestManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -43,8 +43,8 @@
 		01B0993418B726E2003A09D9 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController.xib; sourceTree = "<group>"; };
 		01B0993C18B72714003A09D9 /* ServiceArgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceArgs.h; sourceTree = "<group>"; };
 		01B0993D18B72714003A09D9 /* ServiceArgs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceArgs.m; sourceTree = "<group>"; };
-		01B0994018B72714003A09D9 /* NSURLConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSURLConnectionManager.h; sourceTree = "<group>"; };
-		01B0994118B72714003A09D9 /* NSURLConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSURLConnectionManager.m; sourceTree = "<group>"; };
+		01B0994018B72714003A09D9 /* ServiceRequestManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceRequestManager.h; sourceTree = "<group>"; };
+		01B0994118B72714003A09D9 /* ServiceRequestManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceRequestManager.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,8 +122,8 @@
 			children = (
 				01B0993C18B72714003A09D9 /* ServiceArgs.h */,
 				01B0993D18B72714003A09D9 /* ServiceArgs.m */,
-				01B0994018B72714003A09D9 /* NSURLConnectionManager.h */,
-				01B0994118B72714003A09D9 /* NSURLConnectionManager.m */,
+				01B0994018B72714003A09D9 /* ServiceRequestManager.h */,
+				01B0994118B72714003A09D9 /* ServiceRequestManager.m */,
 			);
 			name = Class;
 			sourceTree = "<group>";
@@ -199,7 +199,7 @@
 				01B0992918B726E2003A09D9 /* AppDelegate.m in Sources */,
 				01B0993218B726E2003A09D9 /* ViewController.m in Sources */,
 				01B0994218B72714003A09D9 /* ServiceArgs.m in Sources */,
-				01B0994418B72714003A09D9 /* NSURLConnectionManager.m in Sources */,
+				01B0994418B72714003A09D9 /* ServiceRequestManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
