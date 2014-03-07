@@ -10,9 +10,10 @@
 #import "ServiceArgs.h"
 
 //block
-typedef void (^requestFinishBlock)();
-typedef void (^requestFailedBlock)();
-typedef void (^requestSuccessBlock)();
+typedef void (^SRMFinishBlock)();
+typedef void (^SRMFailedBlock)();
+typedef void (^SRMSuccessBlock)();
+typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 
 @interface ServiceRequestManager : NSObject<NSURLConnectionDelegate>
 @property (nonatomic,retain) NSURLRequest *request;
@@ -20,18 +21,19 @@ typedef void (^requestSuccessBlock)();
 @property (nonatomic,retain) NSMutableData *responseData;//请求返回数据
 @property (nonatomic,assign) int responseStatusCode;//请求状态
 @property (nonatomic,retain) NSError *error;//请求失败
-@property (readwrite, nonatomic, copy) requestFinishBlock finishBlock;
-@property (readwrite, nonatomic, copy) requestFailedBlock failedBlock;
-@property (readwrite, nonatomic, copy) requestSuccessBlock successBlock;
+@property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
+
 + (id)requestWithRequest:(NSURLRequest*)request;
++ (id)requestWithURL:(NSURL*)url;
 + (id)requestWithArgs:(ServiceArgs*)args;
 + (id)requestWithName:(NSString*)methodName;
 - (id)initWithRequest:(NSURLRequest*)request;
+- (id)initWithURL:(NSURL*)url;
 - (id)initWithArgs:(ServiceArgs*)args;
-- (void)setFinishBlock:(requestFinishBlock)afinishBlock;
-- (void)setFailedBlock:(requestFailedBlock)afailedBlock;
-- (void)setSuccessBlock:(requestSuccessBlock)asuccessBlock;
-
+- (void)setFinishBlock:(SRMFinishBlock)aCompletionBlock;
+- (void)setFailedBlock:(SRMFailedBlock)aFailedBlock;
+- (void)setSuccessBlock:(SRMSuccessBlock)aSuccessBlock;
+- (void)setProgressBlock:(SRMProgressBlock)aBytesReceivedBlock;
 //同步请求
 - (void)startSynchronous;
 //开始异步请求

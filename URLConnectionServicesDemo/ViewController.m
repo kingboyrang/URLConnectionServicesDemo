@@ -18,6 +18,7 @@
 {
     [super viewDidLoad];
 	//==================>使用说明，请查看＝＝＝＝》使用说明v1.0.rtf
+   
     
 }
 
@@ -43,7 +44,6 @@
             NSLog(@"同步请求失败，失败原因=%@",manager.error.description);
             return;
         }
-        
         NSLog(@"同步请求成功，请求结果为=%@",manager.responseString);
     }];
     [manager startSynchronous];//开始同步
@@ -66,5 +66,31 @@
          NSLog(@"异步请求失败，失败原因=%@",manager.error.description);
     }];
     [manager startAsynchronous];//开始异步
+}
+//下载图片==>注图太小了下载过快，看不出什么效果
+- (IBAction)buttonDownloadClick:(id)sender {
+    self.labRate.text=@"0%";
+    self.progressView.progress=0.0;
+    [self.imageView setImage:nil];
+    ServiceRequestManager *manager=[ServiceRequestManager requestWithURL:[NSURL URLWithString:@"http://c.hiphotos.baidu.com/image/h%3D1024%3Bcrop%3D0%2C0%2C1280%2C1024/sign=db9c6b4eba0e7bec3cda07e11d1a825b/622762d0f703918f4271428b533d269758eec4cb.jpg"]];
+    [manager setProgressBlock:^(long long total, long long size, float rate) {
+        NSLog(@"size=%lld",size);
+        self.labRate.text=[NSString stringWithFormat:@"%d%%",(int)(rate*100)];
+        self.progressView.progress=rate;
+    }];
+    [manager setFinishBlock:^() {
+        UIImage *image=[UIImage imageWithData:manager.responseData];
+        [self.imageView setImage:image];
+    }];
+    [manager setFailedBlock:^() {
+        NSLog(@"下载失败，失败原因=%@",manager.error.description);
+    }];
+    [manager startAsynchronous];//开始异步
+}
+- (void)dealloc {
+    [_imageView release];
+    [_labRate release];
+    [_progressView release];
+    [super dealloc];
 }
 @end

@@ -9,7 +9,12 @@
 #import "ServiceRequestManager.h"
 
 @interface ServiceRequestManager ()
+@property (readwrite, nonatomic, copy) SRMFinishBlock finishBlock;
+@property (readwrite, nonatomic, copy) SRMFailedBlock failedBlock;
+@property (readwrite, nonatomic, copy) SRMSuccessBlock successBlock;
+@property (readwrite, nonatomic, copy) SRMProgressBlock progressBlock;
 @property (nonatomic,retain) NSURLConnection *connection;
+@property (nonatomic,assign) long long totalFileSize;
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
 - (void)showNetworkActivityIndicator;
 - (void)hideNetworkActivityIndicator;
@@ -24,26 +29,6 @@
     }
 	[super dealloc];
 }
-- (id)init{
-    if (self=[super init]) {
-        self.error=nil;
-        self.responseString=@"";
-        self.responseStatusCode=100;
-    }
-    return self;
-}
-- (id)initWithRequest:(NSURLRequest*)request{
-    if (self=[super init]) {
-        self.request=request;
-    }
-    return self;
-}
-- (id)initWithArgs:(ServiceArgs*)args{
-    if (self=[super init]) {
-        self.request=[self requestWithServiceArgs:args];
-    }
-    return self;
-}
 + (id)requestWithRequest:(NSURLRequest*)request{
     return [[[self alloc] initWithRequest:request] autorelease];
 }
@@ -54,29 +39,66 @@
     ServiceArgs *args=[ServiceArgs serviceMethodName:methodName];
     return [[[self alloc] initWithArgs:args] autorelease];
 }
-- (void)setFinishBlock:(requestFinishBlock)afinishBlock{
++ (id)requestWithURL:(NSURL*)url{
+    return [[[self alloc] initWithURL:url] autorelease];
+}
+- (id)init{
+    if (self=[super init]) {
+        self.error=nil;
+        self.responseString=@"";
+        self.responseStatusCode=100;
+        self.defaultResponseEncoding=NSUTF8StringEncoding;
+        self.responseData=[[NSMutableData data] retain];
+    }
+    return self;
+}
+- (id)initWithRequest:(NSURLRequest*)request{
+    self=[self init];
+    self.request=request;
+    return self;
+}
+- (id)initWithArgs:(ServiceArgs*)args{
+    self=[self init];
+    self.request=[self requestWithServiceArgs:args];
+    return self;
+}
+- (id)initWithURL:(NSURL*)url{
+    self=[self init];
+    self.request=[NSURLRequest requestWithURL:url];
+    return self;
+}
+- (void)setFinishBlock:(SRMFinishBlock)afinishBlock{
     if (_finishBlock!=afinishBlock) {
         [_finishBlock release];
         _finishBlock=[afinishBlock copy];
     }
 }
-- (void)setFailedBlock:(requestFailedBlock)afailedBlock{
+- (void)setFailedBlock:(SRMFailedBlock)afailedBlock{
     if (_failedBlock!=afailedBlock) {
         [_failedBlock release];
         _failedBlock=[afailedBlock copy];
     }
 }
-- (void)setSuccessBlock:(requestSuccessBlock)asuccessBlock{
+- (void)setSuccessBlock:(SRMSuccessBlock)asuccessBlock{
     if (_successBlock!=asuccessBlock) {
         [_successBlock release];
         _successBlock=[asuccessBlock copy];
     }
 }
+- (void)setProgressBlock:(SRMProgressBlock)aprogressBlock{
+    if (_progressBlock!=aprogressBlock) {
+        [_progressBlock release];
+        _progressBlock=[aprogressBlock copy];
+    }
+}
 - (void)startAsynchronous{
+    /**
     if (!self.responseData) {
         self.responseData=[NSMutableData data];
     }
-    [self.responseData setLength:0];
+     [self.responseData setLength:0];
+     ***/
+    
     if (self.request) {
         [self clearAndDelegate];//取消前一次请求
         self.connection=[[NSURLConnection alloc] initWithRequest:self.request delegate:self];
@@ -85,10 +107,12 @@
     }
 }
 - (void)startSynchronous{
+    /***
     if (!self.responseData) {
         self.responseData=[NSMutableData data];
     }
     [self.responseData setLength:0];
+     ***/
     if (self.request) {
         [self clearAndDelegate];//取消前一次请求
         [self showNetworkActivityIndicator];
@@ -100,7 +124,7 @@
             if (error) {
                 self.responseString=@"";
             }else{
-                NSString *xml=[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+                NSString *xml=[[NSString alloc] initWithData:data encoding:self.defaultResponseEncoding];
                 self.responseString=xml;
                 [xml release];
             }
@@ -117,17 +141,21 @@
 #pragma mark -
 #pragma mark NSURLConnection delegate Methods
 - (void)connection:(NSURLConnection *)con didReceiveResponse:(NSURLResponse *)response {
-    
     // store data
     [self.responseData setLength:0];      //通常在这里先清空接受数据的缓存
     
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     self.responseStatusCode=[httpResponse statusCode];
+    //取得文件大小
+    self.totalFileSize=[response expectedContentLength];
 }
 
 - (void)connection:(NSURLConnection *)con didReceiveData:(NSData *)data {
     [self.responseData appendData:data];    //可能多次收到数据，把新的数据添加在现有数据最后
-   
+    if (self.progressBlock) {
+        long long proValue=[self.responseData length]*1.0;
+        self.progressBlock(self.totalFileSize,[self.responseData length]*1.0,proValue/self.totalFileSize);
+    }
 }
 - (void)connection:(NSURLConnection *)con
   didFailWithError:(NSError *)error
@@ -143,7 +171,7 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
     [self hideNetworkActivityIndicator];
-    NSString *xml=[[NSString alloc] initWithData:self.responseData encoding:NSUTF8StringEncoding];
+    NSString *xml=[[NSString alloc] initWithData:self.responseData encoding:self.defaultResponseEncoding];
     self.responseString=xml;
     [xml release];
     self.error=nil;
