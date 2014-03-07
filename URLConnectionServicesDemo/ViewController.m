@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "ServiceRequestManager.h"
+#import "ServiceOperation.h"
 @interface ViewController ()
 
 @end
@@ -19,6 +20,41 @@
     [super viewDidLoad];
 	//==================>使用说明，请查看＝＝＝＝》使用说明v1.0.rtf
    
+    _queue=[[ServiceOperationQueue alloc] init];
+    
+  NSMutableDictionary *websites = [NSMutableDictionary dictionaryWithCapacity:5] ;
+    [websites setValue:@"http://www.google.com" forKey:@"Google"];
+    [websites setValue:@"http://www.sina.com.cn" forKey:@"sina"];
+    [websites setValue:@"http://www.qq.com" forKey:@"qq"];
+    [websites setValue:@"http://www.apple.com" forKey:@"Apple"];
+    [websites setValue:@"http://www.baidu.com" forKey:@"baidu"];
+    
+    //self.title = @"Operations Demo";
+    
+   
+    
+    // Add operations to download data
+    for (int i=0; i < [[websites allKeys] count] - 1; i++) {
+        NSString *key  = [[websites allKeys] objectAtIndex:i];
+        NSString *urlAsString = [websites valueForKey:key];
+        ServiceOperation *operation = [[ServiceOperation alloc] initWithURL:[NSURL URLWithString:urlAsString]];
+        [operation setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:key,@"name", nil]];
+        [_queue addOperation:operation]; // operation starts as soon as its added
+        [operation release];
+    }
+    
+    [_queue setFinishBlock:^(ServiceOperation *operation) {
+        
+    }];
+    [_queue setCompleteBlock:^{
+        for (ServiceOperation *operation in _queue.operations) {
+            NSDictionary *dic=[operation userInfo];
+           
+            NSLog(@"name=%@",[dic objectForKey:@"name"]);
+            NSLog(@"code=%d",operation.responseStatusCode);
+            NSLog(@"html=%@",[operation responseString]);
+        }
+    }];
     
 }
 
@@ -40,7 +76,6 @@
     ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
     [manager setSuccessBlock:^() {
         if (manager.error) {
-           
             NSLog(@"同步请求失败，失败原因=%@",manager.error.description);
             return;
         }

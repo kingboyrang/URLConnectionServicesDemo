@@ -8,7 +8,12 @@
 
 #import "ServiceRequestManager.h"
 
-@interface ServiceRequestManager ()
+@interface ServiceRequestManager (){
+
+    NSMutableData *responseData_;
+    int statusCode_;
+    NSError *error_;
+}
 @property (readwrite, nonatomic, copy) SRMFinishBlock finishBlock;
 @property (readwrite, nonatomic, copy) SRMFailedBlock failedBlock;
 @property (readwrite, nonatomic, copy) SRMSuccessBlock successBlock;
@@ -22,10 +27,20 @@
 @end
 
 @implementation ServiceRequestManager
+@synthesize responseData=responseData_;
+@synthesize responseStatusCode=statusCode_;
+@synthesize error=error_;
 -(void)dealloc{
     if (self.connection) {
         [self.connection cancel];
         [self.connection release],self.connection=nil;
+    }
+    if (responseData_) {
+         [responseData_ release],responseData_=nil;
+    }
+   
+    if (error_) {
+        [error_ release],error_=nil;
     }
 	[super dealloc];
 }
@@ -44,11 +59,10 @@
 }
 - (id)init{
     if (self=[super init]) {
-        self.error=nil;
-        self.responseString=@"";
-        self.responseStatusCode=100;
+        error_=nil;
+        statusCode_=123;
         self.defaultResponseEncoding=NSUTF8StringEncoding;
-        self.responseData=[[NSMutableData data] retain];
+        responseData_=[[NSMutableData data] retain];
     }
     return self;
 }
@@ -66,6 +80,13 @@
     self=[self init];
     self.request=[NSURLRequest requestWithURL:url];
     return self;
+}
+- (NSString*)responseString{
+    if (responseData_&&[responseData_ length]>0) {
+        NSString *xml=[[NSString alloc] initWithData:responseData_ encoding:self.defaultResponseEncoding];
+        return [xml autorelease];
+    }
+    return @"";
 }
 - (void)setFinishBlock:(SRMFinishBlock)afinishBlock{
     if (_finishBlock!=afinishBlock) {
@@ -92,13 +113,6 @@
     }
 }
 - (void)startAsynchronous{
-    /**
-    if (!self.responseData) {
-        self.responseData=[NSMutableData data];
-    }
-     [self.responseData setLength:0];
-     ***/
-    
     if (self.request) {
         [self clearAndDelegate];//取消前一次请求
         self.connection=[[NSURLConnection alloc] initWithRequest:self.request delegate:self];
@@ -107,12 +121,7 @@
     }
 }
 - (void)startSynchronous{
-    /***
-    if (!self.responseData) {
-        self.responseData=[NSMutableData data];
-    }
-    [self.responseData setLength:0];
-     ***/
+    [responseData_ setLength:0];
     if (self.request) {
         [self clearAndDelegate];//取消前一次请求
         [self showNetworkActivityIndicator];
@@ -120,17 +129,20 @@
             NSHTTPURLResponse *response=nil;
             NSError *error=nil;
             NSData *data=[NSURLConnection sendSynchronousRequest:self.request returningResponse:&response error:&error];
+            statusCode_=[response statusCode];
+            error_=[error retain];
             //请求完成
-            if (error) {
-                self.responseString=@"";
+            if (statusCode_!=200) {
+                [responseData_ release],responseData_=nil;
+                
+                NSString* statusError  = [NSString stringWithFormat:NSLocalizedString(@"HTTP Error: %ld", nil), statusCode_];
+                NSDictionary* userInfo = [NSDictionary dictionaryWithObject:statusError forKey:NSLocalizedDescriptionKey];
+                error_ = [[NSError alloc] initWithDomain:@"ServiceRequestManager"
+                                                    code:statusCode_
+                                                userInfo:userInfo];
             }else{
-                NSString *xml=[[NSString alloc] initWithData:data encoding:self.defaultResponseEncoding];
-                self.responseString=xml;
-                [xml release];
+                [responseData_ appendData:data];
             }
-            self.error=error;
-            self.responseStatusCode=[response statusCode];
-            [self.responseData appendData:data];
             if (self.successBlock) {
                 [self hideNetworkActivityIndicator];
                 self.successBlock();
@@ -142,27 +154,43 @@
 #pragma mark NSURLConnection delegate Methods
 - (void)connection:(NSURLConnection *)con didReceiveResponse:(NSURLResponse *)response {
     // store data
-    [self.responseData setLength:0];      //通常在这里先清空接受数据的缓存
+    [responseData_ setLength:0];      //通常在这里先清空接受数据的缓存
     
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
-    self.responseStatusCode=[httpResponse statusCode];
-    //取得文件大小
-    self.totalFileSize=[response expectedContentLength];
+    statusCode_=[httpResponse statusCode];
+    if(statusCode_ == 200 ) {
+        //取得文件大小
+        self.totalFileSize=[response expectedContentLength];
+    } else {
+        NSString* statusError  = [NSString stringWithFormat:NSLocalizedString(@"HTTP Error: %ld", nil), statusCode_];
+        NSDictionary* userInfo = [NSDictionary dictionaryWithObject:statusError forKey:NSLocalizedDescriptionKey];
+        error_ = [[NSError alloc] initWithDomain:@"ServiceRequestManager"
+                                            code:statusCode_
+                                        userInfo:userInfo];
+        [responseData_ release],responseData_=nil;
+        [self clearAndDelegate];//取消请求
+        [self hideNetworkActivityIndicator];
+        if (self.failedBlock) {
+            self.failedBlock();
+        }
+    }
+    
 }
 
 - (void)connection:(NSURLConnection *)con didReceiveData:(NSData *)data {
-    [self.responseData appendData:data];    //可能多次收到数据，把新的数据添加在现有数据最后
+    [responseData_ appendData:data];    //可能多次收到数据，把新的数据添加在现有数据最后
     if (self.progressBlock) {
-        long long proValue=[self.responseData length]*1.0;
-        self.progressBlock(self.totalFileSize,[self.responseData length]*1.0,proValue/self.totalFileSize);
+        long long proValue=[responseData_ length]*1.0;
+        self.progressBlock(self.totalFileSize,[responseData_ length]*1.0,proValue/self.totalFileSize);
     }
 }
 - (void)connection:(NSURLConnection *)con
   didFailWithError:(NSError *)error
 {
     [self hideNetworkActivityIndicator];
-    self.error=error;
-    self.responseString=@"";
+    error_=[error retain];
+    [responseData_ release];
+    responseData_ = nil;
     if (self.failedBlock) {
         self.failedBlock();
     }
@@ -171,10 +199,7 @@
 - (void)connectionDidFinishLoading:(NSURLConnection *)con
 {
     [self hideNetworkActivityIndicator];
-    NSString *xml=[[NSString alloc] initWithData:self.responseData encoding:self.defaultResponseEncoding];
-    self.responseString=xml;
-    [xml release];
-    self.error=nil;
+   
     if(self.finishBlock)
     {
         self.finishBlock();

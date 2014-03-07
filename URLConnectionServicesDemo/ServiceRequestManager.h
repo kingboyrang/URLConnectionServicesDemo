@@ -17,10 +17,10 @@ typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 
 @interface ServiceRequestManager : NSObject<NSURLConnectionDelegate>
 @property (nonatomic,retain) NSURLRequest *request;
-@property (nonatomic,copy) NSString *responseString;//请求返回字符串
-@property (nonatomic,retain) NSMutableData *responseData;//请求返回数据
-@property (nonatomic,assign) int responseStatusCode;//请求状态
-@property (nonatomic,retain) NSError *error;//请求失败
+@property (nonatomic,readonly) NSString *responseString;//请求返回字符串
+@property (nonatomic,readonly) NSMutableData *responseData;//请求返回数据
+@property (nonatomic,readonly) int responseStatusCode;//请求状态
+@property (nonatomic,readonly) NSError *error;//请求失败
 @property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
 
 + (id)requestWithRequest:(NSURLRequest*)request;

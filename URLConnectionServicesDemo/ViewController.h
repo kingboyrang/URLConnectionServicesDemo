@@ -7,8 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface ViewController : UIViewController
+#import "ServiceOperationQueue.h"
+@interface ViewController : UIViewController{
+    ServiceOperationQueue *_queue;
+}
 @property (retain, nonatomic) IBOutlet UIImageView *imageView;
 @property (retain, nonatomic) IBOutlet UILabel *labRate;
 @property (retain, nonatomic) IBOutlet UIProgressView *progressView;
