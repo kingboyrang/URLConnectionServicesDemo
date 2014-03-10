@@ -16,10 +16,13 @@
 @property (retain, nonatomic) IBOutlet UIProgressView *progressView;
 
 
+
 //同步请求
 - (IBAction)buttonSyncClick:(id)sender;
 //异步请求
 - (IBAction)buttonAsyncClick:(id)sender;
+//队列请求
+- (IBAction)buttonQueueClick:(id)sender;
 //下载图片
 - (IBAction)buttonDownloadClick:(id)sender;
 

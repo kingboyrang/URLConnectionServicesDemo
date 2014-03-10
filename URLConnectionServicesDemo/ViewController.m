@@ -22,40 +22,7 @@
    
     _queue=[[ServiceOperationQueue alloc] init];
     
-  NSMutableDictionary *websites = [NSMutableDictionary dictionaryWithCapacity:5] ;
-    [websites setValue:@"http://www.google.com.hk" forKey:@"Google"];
-    [websites setValue:@"http://www.sina.com.cn" forKey:@"sina"];
-    [websites setValue:@"http://www.qq.com" forKey:@"qq"];
-    [websites setValue:@"http://www.apple.com" forKey:@"Apple"];
-    [websites setValue:@"http://www.baidu.com" forKey:@"baidu"];
-    
-    //self.title = @"Operations Demo";
-    
-   
-    
-    // Add operations to download data
-    for (int i=0; i < [[websites allKeys] count] - 1; i++) {
-        NSString *key  = [[websites allKeys] objectAtIndex:i];
-        NSString *urlAsString = [websites valueForKey:key];
-        ServiceOperation *operation = [[ServiceOperation alloc] initWithURL:[NSURL URLWithString:urlAsString]];
-        [operation setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:key,@"name", nil]];
-        [_queue addOperation:operation]; // operation starts as soon as its added
-        [operation release];
-    }
-    
-    [_queue setFinishBlock:^(ServiceOperation *operation) {
-        
-    }];
-    [_queue setCompleteBlock:^{
-        for (ServiceOperation *operation in _queue.operations) {
-            NSDictionary *dic=[operation userInfo];
-           
-            NSLog(@"name=%@",[dic objectForKey:@"name"]);
-            NSLog(@"code=%d",operation.responseStatusCode);
-            NSLog(@"length=%d",[operation.responseData length]);
-            NSLog(@"html=%@",[operation responseString]);
-        }
-    }];
+ 
     
 }
 
@@ -102,6 +69,47 @@
          NSLog(@"异步请求失败，失败原因=%@",manager.error.description);
     }];
     [manager startAsynchronous];//开始异步
+}
+//队列请法
+- (IBAction)buttonQueueClick:(id)sender {
+    [_queue reset];
+    NSMutableDictionary *websites = [NSMutableDictionary dictionaryWithCapacity:5] ;
+    [websites setValue:@"http://www.google.com.hk" forKey:@"Google"];
+    [websites setValue:@"http://www.sina.com.cn" forKey:@"sina"];
+    [websites setValue:@"http://www.qq.com" forKey:@"qq"];
+    [websites setValue:@"http://www.apple.com" forKey:@"Apple"];
+    [websites setValue:@"http://www.baidu.com" forKey:@"baidu"];
+    
+    //self.title = @"Operations Demo";
+    
+    
+    
+    // Add operations to download data
+    for (int i=0; i < [[websites allKeys] count]; i++) {
+        NSString *key  = [[websites allKeys] objectAtIndex:i];
+        NSString *urlAsString = [websites valueForKey:key];
+        ServiceOperation *operation = [[ServiceOperation alloc] initWithURL:[NSURL URLWithString:urlAsString]];
+        [operation setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:key,@"name", nil]];
+        [_queue addOperation:operation]; // operation starts as soon as its added
+        [operation release];
+    }
+    
+    [_queue setFinishBlock:^(ServiceOperation *operation) {
+        NSDictionary *dic=[operation userInfo];
+        NSLog(@"name=%@,html=%@",[dic objectForKey:@"name"],[operation responseString]);
+        
+        
+    }];
+    [_queue setCompleteBlock:^{
+        /***
+         for (ServiceOperation *operation in _queue.operations) {
+         NSDictionary *dic=[operation userInfo];
+         
+         NSLog(@"name=%@",[dic objectForKey:@"name"]);
+         NSLog(@"html=%@",[operation responseString]);
+         }
+         ***/
+    }];
 }
 //下载图片==>注图太小了下载过快，看不出什么效果
 - (IBAction)buttonDownloadClick:(id)sender {

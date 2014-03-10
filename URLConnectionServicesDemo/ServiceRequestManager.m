@@ -24,6 +24,8 @@
 - (void)showNetworkActivityIndicator;
 - (void)hideNetworkActivityIndicator;
 - (void)clearAndDelegate;
+- (void)parseStringEncodingFromHeaders:(NSDictionary*)responseHeaders;
+- (void)parseMimeType:(NSString **)mimeType andResponseEncoding:(NSStringEncoding *)stringEncoding fromContentType:(NSString *)contentType;
 @end
 
 @implementation ServiceRequestManager
@@ -86,8 +88,7 @@
 }
 - (NSString*)responseString{
     if (responseData_&&[responseData_ length]>0) {
-        NSString *xml=[[NSString alloc] initWithData:responseData_ encoding:self.defaultResponseEncoding];
-        return [xml autorelease];
+       return [[[NSString alloc] initWithBytes:[responseData_ bytes] length:[responseData_ length] encoding:self.defaultResponseEncoding] autorelease];
     }
     return @"";
 }
@@ -132,6 +133,7 @@
             NSHTTPURLResponse *response=nil;
             NSError *error=nil;
             NSData *data=[NSURLConnection sendSynchronousRequest:self.request returningResponse:&response error:&error];
+            [self parseStringEncodingFromHeaders:[response allHeaderFields]];//编码处理
             statusCode_=[response statusCode];
             error_=[error retain];
             //请求完成
@@ -160,6 +162,7 @@
     [responseData_ setLength:0];      //通常在这里先清空接受数据的缓存
     
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+    [self parseStringEncodingFromHeaders:[httpResponse allHeaderFields]];//编码处理
     statusCode_=[httpResponse statusCode];
     if(statusCode_ == 200 ) {
         //取得文件大小
@@ -236,5 +239,41 @@
 - (void)hideNetworkActivityIndicator
 {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+}
+- (void)parseStringEncodingFromHeaders:(NSDictionary*)responseHeaders
+{
+	// Handle response text encoding
+	NSStringEncoding charset = 0;
+	NSString *mimeType = nil;
+	[self parseMimeType:&mimeType andResponseEncoding:&charset fromContentType:[responseHeaders valueForKey:@"Content-Type"]];
+	if (charset != 0) {
+		[self setDefaultResponseEncoding:charset];
+	}
+}
+- (void)parseMimeType:(NSString **)mimeType andResponseEncoding:(NSStringEncoding *)stringEncoding fromContentType:(NSString *)contentType
+{
+	if (!contentType) {
+		return;
+	}
+	NSScanner *charsetScanner = [NSScanner scannerWithString: contentType];
+	if (![charsetScanner scanUpToString:@";" intoString:mimeType] || [charsetScanner scanLocation] == [contentType length]) {
+		*mimeType = [contentType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+		return;
+	}
+	*mimeType = [*mimeType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	NSString *charsetSeparator = @"charset=";
+	NSString *IANAEncoding = nil;
+    
+	if ([charsetScanner scanUpToString: charsetSeparator intoString: NULL] && [charsetScanner scanLocation] < [contentType length]) {
+		[charsetScanner setScanLocation: [charsetScanner scanLocation] + [charsetSeparator length]];
+		[charsetScanner scanUpToString: @";" intoString: &IANAEncoding];
+	}
+    
+	if (IANAEncoding) {
+		CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)IANAEncoding);
+		if (cfEncoding != kCFStringEncodingInvalidId) {
+			*stringEncoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding);
+		}
+	}
 }
 @end

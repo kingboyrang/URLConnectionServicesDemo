@@ -10,6 +10,8 @@
 
 @interface ServiceOperation ()
 - (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
+- (void)parseStringEncodingFromHeaders:(NSDictionary*)responseHeaders;
+- (void)parseMimeType:(NSString **)mimeType andResponseEncoding:(NSStringEncoding *)stringEncoding fromContentType:(NSString *)contentType;
 @end
 
 @implementation ServiceOperation
@@ -59,13 +61,12 @@
 {
     self=[self init];
     self.request=[NSURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    self.defaultResponseEncoding=NSISOLatin1StringEncoding;
     return self;
 }
 - (NSString*)responseString{
     if (data_&&[data_ length]>0) {
-        NSLog(@"11-22");
-        NSString *xml=[[NSString alloc] initWithData:[self responseData] encoding:self.defaultResponseEncoding];
-        return [xml autorelease];
+       return [[[NSString alloc] initWithBytes:[data_ bytes] length:[data_ length] encoding:self.defaultResponseEncoding] autorelease];
     }
     return @"";
 }
@@ -185,6 +186,7 @@
     }
     
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
+    [self parseStringEncodingFromHeaders:[httpResponse allHeaderFields]];//编码处理
     NSInteger statusCode = [httpResponse statusCode];
     statusCode_=statusCode;
     if( statusCode == 200 ) {
@@ -230,5 +232,41 @@
     //body内容
     [request setHTTPBody:[args.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
     return request;
+}
+- (void)parseStringEncodingFromHeaders:(NSDictionary*)responseHeaders
+{
+	// Handle response text encoding
+	NSStringEncoding charset = 0;
+	NSString *mimeType = nil;
+	[self parseMimeType:&mimeType andResponseEncoding:&charset fromContentType:[responseHeaders valueForKey:@"Content-Type"]];
+	if (charset != 0) {
+		[self setDefaultResponseEncoding:charset];
+	}
+}
+- (void)parseMimeType:(NSString **)mimeType andResponseEncoding:(NSStringEncoding *)stringEncoding fromContentType:(NSString *)contentType
+{
+	if (!contentType) {
+		return;
+	}
+	NSScanner *charsetScanner = [NSScanner scannerWithString: contentType];
+	if (![charsetScanner scanUpToString:@";" intoString:mimeType] || [charsetScanner scanLocation] == [contentType length]) {
+		*mimeType = [contentType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+		return;
+	}
+	*mimeType = [*mimeType stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
+	NSString *charsetSeparator = @"charset=";
+	NSString *IANAEncoding = nil;
+    
+	if ([charsetScanner scanUpToString: charsetSeparator intoString: NULL] && [charsetScanner scanLocation] < [contentType length]) {
+		[charsetScanner setScanLocation: [charsetScanner scanLocation] + [charsetSeparator length]];
+		[charsetScanner scanUpToString: @";" intoString: &IANAEncoding];
+	}
+    
+	if (IANAEncoding) {
+		CFStringEncoding cfEncoding = CFStringConvertIANACharSetNameToEncoding((CFStringRef)IANAEncoding);
+		if (cfEncoding != kCFStringEncodingInvalidId) {
+			*stringEncoding = CFStringConvertEncodingToNSStringEncoding(cfEncoding);
+		}
+	}
 }
 @end
