@@ -21,4 +21,5 @@ typedef void (^SOQCompleteBlock)();
 - (void)setFinishBlock:(SOQFinishBlock)afinishBlock;
 - (void)setCompleteBlock:(SOQCompleteBlock)acompleteBlock;
 - (void)addOperation:(ServiceOperation*)operation;
+- (void)reset;//重新开始
 @end

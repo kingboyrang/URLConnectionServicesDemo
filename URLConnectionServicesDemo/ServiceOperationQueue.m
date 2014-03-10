@@ -38,9 +38,9 @@
     self = [super init];
     if (self) {
         operationQueue_ = [[NSOperationQueue alloc] init];
+        //用于判断队列请求是否完成
         [operationQueue_ addObserver:self forKeyPath:@"operations" options:0 context:NULL];
         operationQueue_.maxConcurrentOperationCount = 10;
-        
         operations_=[[NSMutableArray array] retain];
     }
     return self;
@@ -58,8 +58,25 @@
     }
 }
 -(void)addOperation:(ServiceOperation*)operation{
+    //用于判断队列单个请求是否完成
     [operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
     [operationQueue_ addOperation:operation];
+}
+- (void)reset{
+    if (operations_&&[operations_ count]>0) {
+        [operations_ removeAllObjects];
+    }
+    [operationQueue_ cancelAllOperations];
+    if (operationQueue_.operations&&[operationQueue_.operations count]>0) {
+        for (id op in operationQueue_.operations) {
+            if ([op isKindOfClass:[ServiceOperation class]]) {
+                ServiceOperation *operation=(ServiceOperation*)op;
+                [operation removeObserver:self forKeyPath:@"isFinished"];
+            }
+            
+        }
+    }
+    [operationQueue_ setSuspended:NO];
 }
 - (void)observeValueForKeyPath:(NSString *)keyPath
 ofObject:(id)object
@@ -74,7 +91,7 @@ context:(void *)context
                 
                 [operationQueue_ setSuspended:YES];
                 if (self.completeBlock) {
-                    self.completeBlock();
+                    self.completeBlock();//表示所有请求完成
                 }
             }
         }
@@ -85,7 +102,7 @@ context:(void *)context
     }else{
         if ([object isKindOfClass:[ServiceOperation class]]) {
             ServiceOperation *operation=(ServiceOperation*)object;
-            if (operation.isFinished) {
+            if (operation.isFinished) {//表示其中一个请求完成
                 [operations_ addObject:operation];
                 if (self.finishBlock) {
                     self.finishBlock(operation);
