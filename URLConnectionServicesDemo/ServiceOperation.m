@@ -27,6 +27,9 @@
     
     [error_ release];
     error_ = nil;
+    if (responStr_) {
+        [responStr_ release],responStr_=nil;
+    }
     
     [super dealloc];
 }
@@ -60,7 +63,8 @@
 }
 - (NSString*)responseString{
     if (data_&&[data_ length]>0) {
-        NSString *xml=[[NSString alloc] initWithData:data_ encoding:self.defaultResponseEncoding];
+        NSLog(@"11-22");
+        NSString *xml=[[NSString alloc] initWithData:[self responseData] encoding:self.defaultResponseEncoding];
         return [xml autorelease];
     }
     return @"";

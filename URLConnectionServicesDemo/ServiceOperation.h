@@ -17,17 +17,20 @@
     NSURLConnection*  connection_;
     NSMutableData*    data_;
     int statusCode_;
+    NSString *responStr_;
 }
 @property (nonatomic,retain) NSDictionary* userInfo;
 @property (nonatomic,retain) NSURLRequest* request;
 @property (nonatomic,readonly) NSError* error;
 @property (nonatomic,readonly) int responseStatusCode;//请求状态
-@property (nonatomic,readonly) NSString *responseString;
+//@property (nonatomic,readonly) NSString *responseString;
 @property (nonatomic,readonly) NSMutableData *responseData;
 @property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
 
+- (id)initWithURL:(NSURL*)url;
 - (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithArgs:(ServiceArgs*)args;
 - (id)initWithMethodName:(NSString*)name;
-- (id)initWithURL:(NSURL*)url;
+
+-(NSString*)responseString;
 @end

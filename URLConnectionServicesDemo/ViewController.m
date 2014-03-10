@@ -23,7 +23,7 @@
     _queue=[[ServiceOperationQueue alloc] init];
     
   NSMutableDictionary *websites = [NSMutableDictionary dictionaryWithCapacity:5] ;
-    [websites setValue:@"http://www.google.com" forKey:@"Google"];
+    [websites setValue:@"http://www.google.com.hk" forKey:@"Google"];
     [websites setValue:@"http://www.sina.com.cn" forKey:@"sina"];
     [websites setValue:@"http://www.qq.com" forKey:@"qq"];
     [websites setValue:@"http://www.apple.com" forKey:@"Apple"];
@@ -52,6 +52,7 @@
            
             NSLog(@"name=%@",[dic objectForKey:@"name"]);
             NSLog(@"code=%d",operation.responseStatusCode);
+            NSLog(@"length=%d",[operation.responseData length]);
             NSLog(@"html=%@",[operation responseString]);
         }
     }];

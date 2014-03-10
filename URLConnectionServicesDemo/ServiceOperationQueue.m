@@ -16,10 +16,22 @@
 @implementation ServiceOperationQueue
 @synthesize operationQueue=operationQueue_,operations=operations_;
 - (void)dealloc{
+    if (operationQueue_.operations&&[operationQueue_.operations count]>0) {
+        for (id op in operationQueue_.operations) {
+            if ([op isKindOfClass:[ServiceOperation class]]) {
+                ServiceOperation *operation=(ServiceOperation*)op;
+                [operation removeObserver:self forKeyPath:@"isFinished"];
+            }
+            
+        }
+    }
     [operationQueue_ removeObserver:self forKeyPath:@"operations"];
     [operationQueue_ cancelAllOperations];
     [operationQueue_ release],operationQueue_=nil;
     [operations_ release],operations_=nil;
+    if (operations_) {
+        [operations_ release],operations_=nil;
+    }
     [super dealloc];
 }
 - (id)init {
@@ -73,11 +85,13 @@ context:(void *)context
     }else{
         if ([object isKindOfClass:[ServiceOperation class]]) {
             ServiceOperation *operation=(ServiceOperation*)object;
-            [operations_ addObject:operation];
-            if (self.finishBlock) {
-                self.finishBlock(operation);
+            if (operation.isFinished) {
+                [operations_ addObject:operation];
+                if (self.finishBlock) {
+                    self.finishBlock(operation);
+                }
+                [operation removeObserver:self forKeyPath:@"isFinished"];
             }
-            [operation removeObserver:self forKeyPath:@"isFinished"];
         }else{
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }

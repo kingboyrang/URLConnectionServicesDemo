@@ -30,6 +30,7 @@ typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 - (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithURL:(NSURL*)url;
 - (id)initWithArgs:(ServiceArgs*)args;
+- (id)initWithName:(NSString*)methodName;
 - (void)setFinishBlock:(SRMFinishBlock)aCompletionBlock;
 - (void)setFailedBlock:(SRMFailedBlock)aFailedBlock;
 - (void)setSuccessBlock:(SRMSuccessBlock)aSuccessBlock;

@@ -51,8 +51,7 @@
     return [[[self alloc] initWithArgs:args] autorelease];
 }
 + (id)requestWithName:(NSString *)methodName{
-    ServiceArgs *args=[ServiceArgs serviceMethodName:methodName];
-    return [[[self alloc] initWithArgs:args] autorelease];
+    return [[[self alloc] initWithName:methodName] autorelease];
 }
 + (id)requestWithURL:(NSURL*)url{
     return [[[self alloc] initWithURL:url] autorelease];
@@ -80,6 +79,10 @@
     self=[self init];
     self.request=[NSURLRequest requestWithURL:url];
     return self;
+}
+- (id)initWithName:(NSString*)name{
+    ServiceArgs *args=[ServiceArgs serviceMethodName:name];
+    return [self initWithArgs:args];
 }
 - (NSString*)responseString{
     if (responseData_&&[responseData_ length]>0) {
