@@ -23,7 +23,7 @@
 @property (nonatomic,retain) NSURLRequest* request;
 @property (nonatomic,readonly) NSError* error;
 @property (nonatomic,readonly) int responseStatusCode;//请求状态
-//@property (nonatomic,readonly) NSString *responseString;
+@property (nonatomic,readonly) NSString *responseString;
 @property (nonatomic,readonly) NSMutableData *responseData;
 @property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
 
@@ -31,6 +31,4 @@
 - (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithArgs:(ServiceArgs*)args;
 - (id)initWithMethodName:(NSString*)name;
-
--(NSString*)responseString;
 @end

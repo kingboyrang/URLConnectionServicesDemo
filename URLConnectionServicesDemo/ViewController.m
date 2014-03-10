@@ -74,17 +74,10 @@
 - (IBAction)buttonQueueClick:(id)sender {
     [_queue reset];
     NSMutableDictionary *websites = [NSMutableDictionary dictionaryWithCapacity:5] ;
-    [websites setValue:@"http://www.google.com.hk" forKey:@"Google"];
     [websites setValue:@"http://www.sina.com.cn" forKey:@"sina"];
     [websites setValue:@"http://www.qq.com" forKey:@"qq"];
-    [websites setValue:@"http://www.apple.com" forKey:@"Apple"];
-    [websites setValue:@"http://www.baidu.com" forKey:@"baidu"];
-    
-    //self.title = @"Operations Demo";
-    
-    
-    
-    // Add operations to download data
+
+    // 添加url请求
     for (int i=0; i < [[websites allKeys] count]; i++) {
         NSString *key  = [[websites allKeys] objectAtIndex:i];
         NSString *urlAsString = [websites valueForKey:key];
@@ -93,22 +86,38 @@
         [_queue addOperation:operation]; // operation starts as soon as its added
         [operation release];
     }
+    //添加webservice请求1
+    ServiceArgs *args1=[[[ServiceArgs alloc] init] autorelease];
+    args1.serviceURL=@"http://ibdcloud.com:8083/User_APP.asmx";
+    args1.serviceNameSpace=@"http://tempuri.org/";
+    args1.methodName=@"DesEncrypt";
+    args1.soapParams=[NSArray arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:@"123",@"text", nil], nil];
+    ServiceOperation *op1 = [[ServiceOperation alloc] initWithArgs:args1];
+    [op1 setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"DesEncrypt",@"name", nil]];
+    [_queue addOperation:op1];
+    [op1 release];
     
+    //添加webservice请求2
+    ServiceArgs *args2=[[[ServiceArgs alloc] init] autorelease];
+    args2.methodName=@"qqCheckOnline";
+    args2.soapParams=[NSArray arrayWithObjects:[NSDictionary dictionaryWithObjectsAndKeys:@"695749595",@"qqCode", nil], nil];
+    ServiceOperation *op2 = [[ServiceOperation alloc] initWithArgs:args2];
+    [op2 setUserInfo:[NSDictionary dictionaryWithObjectsAndKeys:@"qqCheckOnline",@"name", nil]];
+    [_queue addOperation:op2];
+    [op2 release];
+    
+    //每当一个请求完成就会执行这里
     [_queue setFinishBlock:^(ServiceOperation *operation) {
         NSDictionary *dic=[operation userInfo];
-        NSLog(@"name=%@,html=%@",[dic objectForKey:@"name"],[operation responseString]);
-        
-        
+        NSLog(@"请求名=%@,请求状态=%d,请求完成!",[dic objectForKey:@"name"],operation.responseStatusCode);
+        NSLog(@"请求返回的结果=%@",operation.responseString);
     }];
+    //所有的请求完成就会执行这里
     [_queue setCompleteBlock:^{
-        /***
          for (ServiceOperation *operation in _queue.operations) {
-         NSDictionary *dic=[operation userInfo];
-         
-         NSLog(@"name=%@",[dic objectForKey:@"name"]);
-         NSLog(@"html=%@",[operation responseString]);
+             NSDictionary *dic=[operation userInfo];
+             NSLog(@"name=%@",[dic objectForKey:@"name"]);
          }
-         ***/
     }];
 }
 //下载图片==>注图太小了下载过快，看不出什么效果

@@ -189,7 +189,7 @@
 						<reference key="IBUIFont" ref="736430860"/>
 						<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 					</object>
-					<object class="IBUIButton" id="94181105">
+					<object class="IBUIButton" id="1021767438">
 						<reference key="NSNextResponder" ref="774585933"/>
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{71, 141}, {178, 44}}</string>
@@ -306,7 +306,7 @@
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">buttonQueueClick:</string>
-						<reference key="source" ref="94181105"/>
+						<reference key="source" ref="1021767438"/>
 						<reference key="destination" ref="372490531"/>
 						<int key="IBEventType">7</int>
 					</object>
@@ -343,7 +343,7 @@
 							<reference ref="419668841"/>
 							<reference ref="786681991"/>
 							<reference ref="324132141"/>
-							<reference ref="94181105"/>
+							<reference ref="1021767438"/>
 						</array>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -388,7 +388,7 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">98</int>
-						<reference key="object" ref="94181105"/>
+						<reference key="object" ref="1021767438"/>
 						<reference key="parent" ref="774585933"/>
 					</object>
 				</array>

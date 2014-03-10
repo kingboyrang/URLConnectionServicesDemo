@@ -86,12 +86,13 @@ context:(void *)context
     if (object==operationQueue_) {
         if ([keyPath isEqualToString:@"operations"])
         {
+            //表示所有请求完成
             if (0 == operationQueue_.operations.count)
             {
                 
                 [operationQueue_ setSuspended:YES];
                 if (self.completeBlock) {
-                    self.completeBlock();//表示所有请求完成
+                    self.completeBlock();
                 }
             }
         }
@@ -100,21 +101,17 @@ context:(void *)context
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     }else{
-        if ([object isKindOfClass:[ServiceOperation class]]) {
+        if ([object isKindOfClass:[ServiceOperation class]]) {//表示其中一个请求完成
             ServiceOperation *operation=(ServiceOperation*)object;
-            if (operation.isFinished) {//表示其中一个请求完成
-                [operations_ addObject:operation];
-                if (self.finishBlock) {
-                    self.finishBlock(operation);
-                }
-                [operation removeObserver:self forKeyPath:@"isFinished"];
+            [operations_ addObject:operation];
+            if (self.finishBlock) {
+                self.finishBlock(operation);
             }
+            [operation removeObserver:self forKeyPath:@"isFinished"];
         }else{
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     }
     
 }
-
-
 @end
