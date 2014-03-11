@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0110088318C4349F00112E46 /* 使用说明v1.0.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 0110088218C4349F00112E46 /* 使用说明v1.0.rtf */; };
+		012294F918CF057D00291210 /* ServiceOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 012294F818CF057D00291210 /* ServiceOperationQueue.m */; };
 		018B833E18C99C8A0068527A /* ServiceOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 018B833D18C99C8A0068527A /* ServiceOperation.m */; };
-		018B834118C9B9530068527A /* ServiceOperationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 018B834018C9B9530068527A /* ServiceOperationQueue.m */; };
 		01B0991918B726E1003A09D9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01B0991818B726E1003A09D9 /* UIKit.framework */; };
 		01B0991B18B726E1003A09D9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01B0991A18B726E1003A09D9 /* Foundation.framework */; };
 		01B0991D18B726E1003A09D9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 01B0991C18B726E1003A09D9 /* CoreGraphics.framework */; };
@@ -27,10 +27,10 @@
 
 /* Begin PBXFileReference section */
 		0110088218C4349F00112E46 /* 使用说明v1.0.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "使用说明v1.0.rtf"; sourceTree = "<group>"; };
+		012294F718CF057C00291210 /* ServiceOperationQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceOperationQueue.h; sourceTree = "<group>"; };
+		012294F818CF057D00291210 /* ServiceOperationQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceOperationQueue.m; sourceTree = "<group>"; };
 		018B833C18C99C8A0068527A /* ServiceOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceOperation.h; sourceTree = "<group>"; };
 		018B833D18C99C8A0068527A /* ServiceOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceOperation.m; sourceTree = "<group>"; };
-		018B833F18C9B9530068527A /* ServiceOperationQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ServiceOperationQueue.h; sourceTree = "<group>"; };
-		018B834018C9B9530068527A /* ServiceOperationQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServiceOperationQueue.m; sourceTree = "<group>"; };
 		01B0991518B726E1003A09D9 /* URLConnectionServicesDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = URLConnectionServicesDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		01B0991818B726E1003A09D9 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		01B0991A18B726E1003A09D9 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -132,8 +132,8 @@
 				01B0994118B72714003A09D9 /* ServiceRequestManager.m */,
 				018B833C18C99C8A0068527A /* ServiceOperation.h */,
 				018B833D18C99C8A0068527A /* ServiceOperation.m */,
-				018B833F18C9B9530068527A /* ServiceOperationQueue.h */,
-				018B834018C9B9530068527A /* ServiceOperationQueue.m */,
+				012294F718CF057C00291210 /* ServiceOperationQueue.h */,
+				012294F818CF057D00291210 /* ServiceOperationQueue.m */,
 			);
 			name = Class;
 			sourceTree = "<group>";
@@ -207,11 +207,11 @@
 			files = (
 				01B0992518B726E1003A09D9 /* main.m in Sources */,
 				01B0992918B726E2003A09D9 /* AppDelegate.m in Sources */,
-				018B834118C9B9530068527A /* ServiceOperationQueue.m in Sources */,
 				01B0993218B726E2003A09D9 /* ViewController.m in Sources */,
 				01B0994218B72714003A09D9 /* ServiceArgs.m in Sources */,
 				01B0994418B72714003A09D9 /* ServiceRequestManager.m in Sources */,
 				018B833E18C99C8A0068527A /* ServiceOperation.m in Sources */,
+				012294F918CF057D00291210 /* ServiceOperationQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

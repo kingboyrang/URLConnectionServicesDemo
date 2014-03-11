@@ -17,6 +17,7 @@
 @property (readwrite, nonatomic, copy) SRMFinishBlock finishBlock;
 @property (readwrite, nonatomic, copy) SRMFailedBlock failedBlock;
 @property (readwrite, nonatomic, copy) SRMSuccessBlock successBlock;
+@property (readwrite, nonatomic, copy) SRMSizeBlock sizeBlock;
 @property (readwrite, nonatomic, copy) SRMProgressBlock progressBlock;
 @property (nonatomic,retain) NSURLConnection *connection;
 @property (nonatomic,assign) long long totalFileSize;
@@ -110,6 +111,13 @@
         _successBlock=[asuccessBlock copy];
     }
 }
+- (void)setDownloadSizeIncrementedBlock:(SRMSizeBlock)aDownloadSizeIncrementedBlock
+{
+    if (_sizeBlock!=aDownloadSizeIncrementedBlock) {
+        [_sizeBlock release];
+        _sizeBlock=[aDownloadSizeIncrementedBlock copy];
+    }
+}
 - (void)setProgressBlock:(SRMProgressBlock)aprogressBlock{
     if (_progressBlock!=aprogressBlock) {
         [_progressBlock release];
@@ -164,6 +172,11 @@
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     [self parseStringEncodingFromHeaders:[httpResponse allHeaderFields]];//编码处理
     statusCode_=[httpResponse statusCode];
+    
+    if (self.sizeBlock) {
+        self.sizeBlock([response expectedContentLength]);
+    }
+    
     if(statusCode_ == 200 ) {
         //取得文件大小
         self.totalFileSize=[response expectedContentLength];

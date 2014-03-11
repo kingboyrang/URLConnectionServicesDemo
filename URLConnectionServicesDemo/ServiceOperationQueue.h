@@ -1,8 +1,8 @@
 //
-//  ServiceOperationQueue.h
+//  ServiceQueue.h
 //  URLConnectionServicesDemo
 //
-//  Created by aJia on 2014/3/7.
+//  Created by aJia on 2014/3/11.
 //  Copyright (c) 2014年 lz. All rights reserved.
 //
 
@@ -12,14 +12,13 @@
 typedef void (^SOQFinishBlock)(ServiceOperation *operation);
 typedef void (^SOQCompleteBlock)();
 
-@interface ServiceOperationQueue : NSObject{
-    NSOperationQueue *operationQueue_;
-    NSMutableArray *operations_;
+@interface ServiceOperationQueue : NSOperationQueue{
+   BOOL finished_;
+   NSMutableArray *items_;
 }
-@property (nonatomic,readonly) NSOperationQueue *operationQueue;
-@property (nonatomic,readonly) NSArray *operations;
+@property (nonatomic,assign) BOOL showNetworkActivityIndicator;
+@property (nonatomic,readonly) NSArray *items;
 - (void)setFinishBlock:(SOQFinishBlock)afinishBlock;
 - (void)setCompleteBlock:(SOQCompleteBlock)acompleteBlock;
-- (void)addOperation:(ServiceOperation*)operation;
 - (void)reset;//重置
 @end

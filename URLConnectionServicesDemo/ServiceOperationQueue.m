@@ -1,8 +1,8 @@
 //
-//  ServiceOperationQueue.m
+//  ServiceQueue.m
 //  URLConnectionServicesDemo
 //
-//  Created by aJia on 2014/3/7.
+//  Created by aJia on 2014/3/11.
 //  Copyright (c) 2014年 lz. All rights reserved.
 //
 
@@ -14,10 +14,15 @@
 @end
 
 @implementation ServiceOperationQueue
-@synthesize operationQueue=operationQueue_,operations=operations_;
+@synthesize items=items_;
 - (void)dealloc{
-    if (operationQueue_.operations&&[operationQueue_.operations count]>0) {
-        for (id op in operationQueue_.operations) {
+    if (items_) {
+        [items_ release],items_=nil;
+    }
+    [self removeObserver:self forKeyPath:@"operations"];
+    [self cancelAllOperations];
+    if (self.operations&&[self.operations count]>0) {
+        for (id op in self.operations) {
             if ([op isKindOfClass:[ServiceOperation class]]) {
                 ServiceOperation *operation=(ServiceOperation*)op;
                 [operation removeObserver:self forKeyPath:@"isFinished"];
@@ -25,25 +30,29 @@
             
         }
     }
-    [operationQueue_ removeObserver:self forKeyPath:@"operations"];
-    [operationQueue_ cancelAllOperations];
-    [operationQueue_ release],operationQueue_=nil;
-    [operations_ release],operations_=nil;
-    if (operations_) {
-        [operations_ release],operations_=nil;
-    }
     [super dealloc];
 }
-- (id)init {
-    self = [super init];
-    if (self) {
-        operationQueue_ = [[NSOperationQueue alloc] init];
+- (id)init{
+    if (self=[super init]) {
+        self.showNetworkActivityIndicator=YES;
+        self.maxConcurrentOperationCount=10;
+        items_=[[NSMutableArray array] retain];
         //用于判断队列请求是否完成
-        [operationQueue_ addObserver:self forKeyPath:@"operations" options:0 context:NULL];
-        operationQueue_.maxConcurrentOperationCount = 10;
-        operations_=[[NSMutableArray array] retain];
+        [self addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
     return self;
+}
+- (BOOL)isFinished
+{
+    return finished_;
+}
+-(void)addOperation:(NSOperation *)op
+{
+    if ([op isKindOfClass:[ServiceOperation class]]) {
+        ServiceOperation *operation=(ServiceOperation*)op;
+        [operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
+    }
+    [super addOperation:op];
 }
 - (void)setFinishBlock:(SOQFinishBlock)afinishBlock{
     if (_finishBlock!=afinishBlock) {
@@ -57,18 +66,13 @@
         _completeBlock=[acompleteBlock copy];
     }
 }
--(void)addOperation:(ServiceOperation*)operation{
-    //用于判断队列单个请求是否完成
-    [operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
-    [operationQueue_ addOperation:operation];
-}
 - (void)reset{
-    if (operations_&&[operations_ count]>0) {
-        [operations_ removeAllObjects];
+    if (items_&&[items_ count]>0) {
+        [items_ removeAllObjects];
     }
-    [operationQueue_ cancelAllOperations];
-    if (operationQueue_.operations&&[operationQueue_.operations count]>0) {
-        for (id op in operationQueue_.operations) {
+    [self cancelAllOperations];
+    if (self.operations&&[self.operations count]>0) {
+        for (id op in self.operations) {
             if ([op isKindOfClass:[ServiceOperation class]]) {
                 ServiceOperation *operation=(ServiceOperation*)op;
                 [operation removeObserver:self forKeyPath:@"isFinished"];
@@ -76,21 +80,30 @@
             
         }
     }
-    [operationQueue_ setSuspended:NO];
+    [self setSuspended:NO];
+    [self willChangeValueForKey:@"isFinished"];
+    finished_  = NO;
+    [self didChangeValueForKey:@"isFinished"];
 }
 - (void)observeValueForKeyPath:(NSString *)keyPath
-ofObject:(id)object
-change:(NSDictionary *)change
-context:(void *)context
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
 {
-    if (object==operationQueue_) {
+    if (object==self) {
         if ([keyPath isEqualToString:@"operations"])
         {
+            if (self.showNetworkActivityIndicator) {
+                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.operations.count>0)];
+            }
             //表示所有请求完成
-            if (0 == operationQueue_.operations.count)
+            if (0 == self.operations.count)
             {
                 
-                [operationQueue_ setSuspended:YES];
+                [self setSuspended:YES];
+                [self willChangeValueForKey:@"isFinished"];
+                finished_  = YES;
+                [self didChangeValueForKey:@"isFinished"];
                 if (self.completeBlock) {
                     self.completeBlock();
                 }
@@ -101,9 +114,10 @@ context:(void *)context
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     }else{
-        if ([object isKindOfClass:[ServiceOperation class]]) {//表示其中一个请求完成
+        //表示其中一个请求完成
+        if ([object isKindOfClass:[ServiceOperation class]]&&[keyPath isEqualToString:@"isFinished"]) {
             ServiceOperation *operation=(ServiceOperation*)object;
-            [operations_ addObject:operation];
+            [items_ addObject:operation];
             if (self.finishBlock) {
                 self.finishBlock(operation);
             }
@@ -112,6 +126,5 @@ context:(void *)context
             [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
         }
     }
-    
 }
 @end

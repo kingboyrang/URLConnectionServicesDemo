@@ -110,13 +110,14 @@
     [_queue setFinishBlock:^(ServiceOperation *operation) {
         NSDictionary *dic=[operation userInfo];
         NSLog(@"请求名=%@,请求状态=%d,请求完成!",[dic objectForKey:@"name"],operation.responseStatusCode);
-        NSLog(@"请求返回的结果=%@",operation.responseString);
+        //NSLog(@"请求返回的结果=%@",operation.responseString);
     }];
     //所有的请求完成就会执行这里
     [_queue setCompleteBlock:^{
-         for (ServiceOperation *operation in _queue.operations) {
+         for (ServiceOperation *operation in _queue.items) {
              NSDictionary *dic=[operation userInfo];
              NSLog(@"name=%@",[dic objectForKey:@"name"]);
+             NSLog(@"请求返回的结果=%@",operation.responseString);
          }
     }];
 }

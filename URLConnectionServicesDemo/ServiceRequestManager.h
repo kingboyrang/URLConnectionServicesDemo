@@ -13,6 +13,7 @@
 typedef void (^SRMFinishBlock)();
 typedef void (^SRMFailedBlock)();
 typedef void (^SRMSuccessBlock)();
+typedef void (^SRMSizeBlock)(long long size);
 typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 
 @interface ServiceRequestManager : NSObject<NSURLConnectionDelegate>
@@ -23,17 +24,18 @@ typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 @property (nonatomic,readonly) NSError *error;//请求失败
 @property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
 
-+ (id)requestWithRequest:(NSURLRequest*)request;
 + (id)requestWithURL:(NSURL*)url;
++ (id)requestWithRequest:(NSURLRequest*)request;
 + (id)requestWithArgs:(ServiceArgs*)args;
 + (id)requestWithName:(NSString*)methodName;
-- (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithURL:(NSURL*)url;
+- (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithArgs:(ServiceArgs*)args;
 - (id)initWithName:(NSString*)methodName;
 - (void)setFinishBlock:(SRMFinishBlock)aCompletionBlock;
 - (void)setFailedBlock:(SRMFailedBlock)aFailedBlock;
 - (void)setSuccessBlock:(SRMSuccessBlock)aSuccessBlock;
+- (void)setDownloadSizeIncrementedBlock:(SRMSizeBlock)aDownloadSizeIncrementedBlock;
 - (void)setProgressBlock:(SRMProgressBlock)aBytesReceivedBlock;
 //同步请求
 - (void)startSynchronous;
