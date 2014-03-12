@@ -16,9 +16,9 @@ typedef void (^SOQCompleteBlock)();
    BOOL finished_;
    NSMutableArray *items_;
 }
-@property (nonatomic,assign) BOOL showNetworkActivityIndicator;
-@property (nonatomic,readonly) NSArray *items;
-- (void)setFinishBlock:(SOQFinishBlock)afinishBlock;
-- (void)setCompleteBlock:(SOQCompleteBlock)acompleteBlock;
+@property (nonatomic,assign) BOOL showNetworkActivityIndicator;//是否在状态栏显示网络请求中
+@property (nonatomic,readonly) NSArray *items;//保存请求完成后的线程
+- (void)setFinishBlock:(SOQFinishBlock)afinishBlock;//其中一个请求完成后执行
+- (void)setCompleteBlock:(SOQCompleteBlock)acompleteBlock;//所有请求完成
 - (void)reset;//重置
 @end
