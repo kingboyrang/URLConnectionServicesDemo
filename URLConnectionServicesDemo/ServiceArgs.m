@@ -63,6 +63,9 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     return [self stringSoapMessage:[self soapParams]];
 }
 -(NSDictionary*)headers{
+    if (_headers&&[_headers count]>0) {
+        return _headers;
+    }
     NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[[self webURL] host] forKey:@"Host"];

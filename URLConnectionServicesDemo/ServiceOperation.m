@@ -47,15 +47,10 @@
     return self;
 }
 - (id)initWithArgs:(ServiceArgs*)args{
-    self=[self init];
-    self.request=[self requestWithServiceArgs:args];
-    return self;
+    return [self initWithRequest:[self requestWithServiceArgs:args]];
 }
 - (id)initWithMethodName:(NSString*)name{
-    self=[self init];
-    ServiceArgs *args=[ServiceArgs serviceMethodName:name];
-    self.request=[self requestWithServiceArgs:args];
-    return self;
+    return [self initWithArgs:[ServiceArgs serviceMethodName:name]];
 }
 - (id)initWithURL:(NSURL *)url
 {

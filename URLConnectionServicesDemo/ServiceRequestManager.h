@@ -27,11 +27,11 @@ typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 + (id)requestWithURL:(NSURL*)url;
 + (id)requestWithRequest:(NSURLRequest*)request;
 + (id)requestWithArgs:(ServiceArgs*)args;
-+ (id)requestWithName:(NSString*)methodName;
++ (id)requestWithName:(NSString*)methodName;//无参数的webservice请求
 - (id)initWithURL:(NSURL*)url;
 - (id)initWithRequest:(NSURLRequest*)request;
 - (id)initWithArgs:(ServiceArgs*)args;
-- (id)initWithName:(NSString*)methodName;
+- (id)initWithName:(NSString*)methodName;//无参数的webservice请求
 - (void)setFinishBlock:(SRMFinishBlock)aCompletionBlock;
 - (void)setFailedBlock:(SRMFailedBlock)aFailedBlock;
 - (void)setSuccessBlock:(SRMSuccessBlock)aSuccessBlock;

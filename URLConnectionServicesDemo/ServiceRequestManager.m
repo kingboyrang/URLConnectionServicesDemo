@@ -74,18 +74,13 @@
     return self;
 }
 - (id)initWithArgs:(ServiceArgs*)args{
-    self=[self init];
-    self.request=[self requestWithServiceArgs:args];
-    return self;
+    return [self initWithRequest:[self requestWithServiceArgs:args]];
 }
 - (id)initWithURL:(NSURL*)url{
-    self=[self init];
-    self.request=[NSURLRequest requestWithURL:url];
-    return self;
+    return [self initWithRequest:[NSURLRequest requestWithURL:url]];
 }
 - (id)initWithName:(NSString*)name{
-    ServiceArgs *args=[ServiceArgs serviceMethodName:name];
-    return [self initWithArgs:args];
+    return [self initWithArgs:[ServiceArgs serviceMethodName:name]];
 }
 - (NSString*)responseString{
     if (responseData_&&[responseData_ length]>0) {
