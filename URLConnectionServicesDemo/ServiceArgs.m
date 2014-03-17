@@ -89,7 +89,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
         [soap appendFormat:@"</%@>",[self methodName]];
         return [NSString stringWithFormat:[self defaultSoapMesage],header,soap];
     }
-        NSString *body=[NSString stringWithFormat:@"<%@%@ />",[self methodName],xmlnsStr];
+    NSString *body=[NSString stringWithFormat:@"<%@%@ />",[self methodName],xmlnsStr];
     return [NSString stringWithFormat:[self defaultSoapMesage],header,body];
 }
 +(ServiceArgs*)serviceMethodName:(NSString*)methodName{
