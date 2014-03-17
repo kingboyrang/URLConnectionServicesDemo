@@ -22,7 +22,7 @@
    
     _queue=[[ServiceOperationQueue alloc] init];
     
- 
+   
     
 }
 
@@ -40,7 +40,7 @@
     ServiceArgs *args=[[[ServiceArgs alloc] init] autorelease];
     args.methodName=@"qqCheckOnline";//要调用的webservice方法
     args.soapParams=params;//传递方法参数
-    
+    NSLog(@"soap=%@",args.soapMessage);
     ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
     [manager setSuccessBlock:^() {
         if (manager.error) {

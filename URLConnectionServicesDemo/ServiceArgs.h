@@ -14,6 +14,7 @@
 @property(nonatomic,copy) NSString *serviceNameSpace;
 @property(nonatomic,copy) NSString *methodName;
 @property(nonatomic,copy) NSString *soapMessage;
+@property(nonatomic,copy) NSString *soapHeader;
 @property(nonatomic,retain) NSDictionary *headers;
 //soapMessage处理
 @property(nonatomic,readonly) NSString *defaultSoapMesage;
