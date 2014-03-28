@@ -22,7 +22,6 @@
    
     _queue=[[ServiceOperationQueue alloc] init];
     
-   
 }
 - (void)didReceiveMemoryWarning
 {
