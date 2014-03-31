@@ -79,20 +79,15 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     if (self.httpWay==ServiceHttpGet) {
         return [NSDictionary dictionaryWithObjectsAndKeys:[self.webURL host],@"Host", nil];
     }
-    if (self.httpWay==ServiceHttpPost) {
-        NSMutableDictionary *dic=[NSMutableDictionary dictionary];
-        [dic setValue:[[self webURL] host] forKey:@"Host"];
-        [dic setValue:@"application/x-www-form-urlencoded" forKey:@"Content-Type"];
-        [dic setValue:[NSString stringWithFormat:@"%d",[[self soapMessage] length]] forKey:@"Content-Length"];
-        return dic;
-    }
-    NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[[self webURL] host] forKey:@"Host"];
-    [dic setValue:@"text/xml; charset=utf-8" forKey:@"Content-Type"];
+    [dic setValue:self.httpWay==ServiceHttpPost?@"application/x-www-form-urlencoded":@"text/xml; charset=utf-8" forKey:@"Content-Type"];
     [dic setValue:[NSString stringWithFormat:@"%d",[[self soapMessage] length]] forKey:@"Content-Length"];
-    if ([soapAction length]>0) {
-         [dic setValue:soapAction forKey:@"SOAPAction"];
+    if (self.httpWay==ServiceHttpSoap) {
+        NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
+        if ([soapAction length]>0) {
+            [dic setValue:soapAction forKey:@"SOAPAction"];
+        }
     }
     return dic;
 }

@@ -22,6 +22,21 @@
    
     _queue=[[ServiceOperationQueue alloc] init];
     
+    NSMutableArray *params=[NSMutableArray array];
+    [params addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"695749595",@"qqCode", nil]];
+    
+    ServiceArgs *args=[[[ServiceArgs alloc] init] autorelease];
+    args.methodName=@"qqCheckOnline";//要调用的webservice方法
+    args.soapParams=params;//传递方法参数
+    
+    ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
+    [manager setFinishBlock:^() {
+        NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
+    }];
+    [manager setFailedBlock:^() {
+        NSLog(@"异步请求失败，失败原因=%@",manager.error.description);
+    }];
+    [manager startAsynchronous];//开始异步
 }
 - (void)didReceiveMemoryWarning
 {
