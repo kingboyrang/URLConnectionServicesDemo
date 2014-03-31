@@ -7,7 +7,10 @@
 //
 
 #import "ServiceArgs.h"
-
+//soap 1.1请求方式
+#define defaultSoap1Message @"<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\"><soap:Header>%@</soap:Header><soap:Body>%@</soap:Body></soap:Envelope>"
+//soap 1.2请求方式
+#define defaultSoap12Message @"<?xml version=\"1.0\" encoding=\"utf-8\"?><soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\"><soap12:Header>%@</soap12:Header><soap12:Body>%@</soap12:Body></soap12:Envelope>"
 @interface ServiceArgs()
 -(NSString*)stringSoapMessage:(NSArray*)params;
 -(NSString*)paramsFormatString:(NSArray*)params;
@@ -37,7 +40,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
 }
 -(id)init{
     if (self=[super init]) {
-        self.httpWay=ServiceHttpSoap;
+        self.httpWay=ServiceHttpSoap12;
         self.timeOutSeconds=60.0;
     }
     return self;
@@ -45,10 +48,10 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
 #pragma mark -
 #pragma mark 属性重写
 -(NSString*)defaultSoapMesage{
-    NSString *soapBody=@"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
-    "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n"
-    "<soap:Header>%@</soap:Header><soap:Body>%@</soap:Body></soap:Envelope>";
-    return soapBody;
+    if (self.httpWay==ServiceHttpSoap1) {
+        return defaultSoap1Message;
+    }
+    return defaultSoap12Message;
 }
 -(NSURL*)webURL{
     return [NSURL URLWithString:[self serviceURL]];
@@ -83,9 +86,17 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     }
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[[self webURL] host] forKey:@"Host"];
-    [dic setValue:self.httpWay==ServiceHttpPost?@"application/x-www-form-urlencoded":@"text/xml; charset=utf-8" forKey:@"Content-Type"];
+    if (self.httpWay==ServiceHttpPost) {
+        [dic setValue:@"application/x-www-form-urlencoded" forKey:@"Content-Type"];
+    }
+    if (self.httpWay==ServiceHttpSoap1) {
+        [dic setValue:@"text/xml; charset=utf-8" forKey:@"Content-Type"];
+    }
+    if (self.httpWay==ServiceHttpSoap12) {
+        [dic setValue:@"application/soap+xml; charset=utf-8" forKey:@"Content-Type"];
+    }
     [dic setValue:[NSString stringWithFormat:@"%d",[[self bodyMessage] length]] forKey:@"Content-Length"];
-    if (self.httpWay==ServiceHttpSoap) {
+    if (self.httpWay==ServiceHttpSoap1) {
         NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
         if ([soapAction length]>0) {
             [dic setValue:soapAction forKey:@"SOAPAction"];
@@ -139,7 +150,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
 #pragma mark -
 #pragma mark 私有方法
 -(NSURL*)requestURL{
-    if (self.httpWay==ServiceHttpSoap) {
+    if (self.httpWay==ServiceHttpSoap1||self.httpWay==ServiceHttpSoap12) {
         return [self webURL];
     }
     if (self.httpWay==ServiceHttpGet) {

@@ -56,7 +56,10 @@
     ServiceArgs *args=[[[ServiceArgs alloc] init] autorelease];
     args.methodName=@"qqCheckOnline";//要调用的webservice方法
     args.soapParams=params;//传递方法参数
-    
+    //设置请求方式
+    //args.httpWay=ServiceHttpPost;
+    NSLog(@"请求头=%@",args.headers);
+    NSLog(@"请求内容=%@",args.bodyMessage);
     ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
     [manager setFinishBlock:^() {
         NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
