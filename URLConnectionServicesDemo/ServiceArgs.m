@@ -9,6 +9,7 @@
 #import "ServiceArgs.h"
 
 @interface ServiceArgs()
+-(NSString*)stringSoapMessage:(NSArray*)params;
 -(NSString*)paramsFormatString:(NSArray*)params;
 -(NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName;
 -(NSString*)paramsTostring;
@@ -37,6 +38,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
 -(id)init{
     if (self=[super init]) {
         self.httpWay=ServiceHttpSoap;
+        self.timeOutSeconds=60.0;
     }
     return self;
 }
@@ -63,9 +65,9 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     }
     return defaultWebServiceNameSpace;
 }
--(NSString*)soapMessage{
-    if (_soapMessage&&[_soapMessage length]>0) {
-        return _soapMessage;
+-(NSString*)bodyMessage{
+    if (_bodyMessage&&[_bodyMessage length]>0) {
+        return _bodyMessage;
     }
     if (self.httpWay==ServiceHttpPost) {
         return [self paramsTostring];
@@ -82,7 +84,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[[self webURL] host] forKey:@"Host"];
     [dic setValue:self.httpWay==ServiceHttpPost?@"application/x-www-form-urlencoded":@"text/xml; charset=utf-8" forKey:@"Content-Type"];
-    [dic setValue:[NSString stringWithFormat:@"%d",[[self soapMessage] length]] forKey:@"Content-Length"];
+    [dic setValue:[NSString stringWithFormat:@"%d",[[self bodyMessage] length]] forKey:@"Content-Length"];
     if (self.httpWay==ServiceHttpSoap) {
         NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
         if ([soapAction length]>0) {
@@ -96,16 +98,12 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     //头部设置
     [req setAllHTTPHeaderFields:[self headers]];
     //超时设置
-    [req setTimeoutInterval:60];
+    [req setTimeoutInterval:self.timeOutSeconds];
     //访问方式
-    if (self.httpWay==ServiceHttpGet) {
-        [req setHTTPMethod:@"GET"];
-    }else{
-        [req setHTTPMethod:@"POST"];
-    }
+    [req setHTTPMethod:self.httpWay==ServiceHttpGet?@"GET":@"POST"];
     //body内容
     if (self.httpWay!=ServiceHttpGet) {
-        [req setHTTPBody:[self.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
+        [req setHTTPBody:[self.bodyMessage dataUsingEncoding:NSUTF8StringEncoding]];
     }
     return req;
 }
@@ -132,9 +130,9 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     ServiceArgs *args=[[[ServiceArgs alloc] init] autorelease];
     args.methodName=name;
     if (msg&&[msg length]>0) {
-        args.soapMessage=msg;
+        args.bodyMessage=msg;
     }else{
-        args.soapMessage=[args stringSoapMessage:nil];
+        args.bodyMessage=[args stringSoapMessage:nil];
     }
     return args;
 }
