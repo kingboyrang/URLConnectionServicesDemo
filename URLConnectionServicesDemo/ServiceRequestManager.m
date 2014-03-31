@@ -21,7 +21,6 @@
 @property (readwrite, nonatomic, copy) SRMProgressBlock progressBlock;
 @property (nonatomic,retain) NSURLConnection *connection;
 @property (nonatomic,assign) long long totalFileSize;
-- (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
 - (void)showNetworkActivityIndicator;
 - (void)hideNetworkActivityIndicator;
 - (void)clearAndDelegate;
@@ -74,7 +73,7 @@
     return self;
 }
 - (id)initWithArgs:(ServiceArgs*)args{
-    return [self initWithRequest:[self requestWithServiceArgs:args]];
+    return [self initWithRequest:[args request]];
 }
 - (id)initWithURL:(NSURL*)url{
     return [self initWithRequest:[NSURLRequest requestWithURL:url]];
@@ -226,19 +225,6 @@
         [self.connection cancel];
         [self.connection release],self.connection=nil;
     }
-}
-- (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args{
-    
-    NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:args.webURL];
-    //头部设置
-    [request setAllHTTPHeaderFields:[args headers]];
-    //超时设置
-    [request setTimeoutInterval:60];
-    //访问方式
-    [request setHTTPMethod:@"POST"];
-    //body内容
-    [request setHTTPBody:[args.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
-    return request;
 }
 - (void)showNetworkActivityIndicator
 {

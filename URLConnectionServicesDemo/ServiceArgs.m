@@ -11,6 +11,8 @@
 @interface ServiceArgs()
 -(NSString*)paramsFormatString:(NSArray*)params;
 -(NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName;
+-(NSString*)paramsTostring;
+-(NSURL*)requestURL;
 @end
 
 static NSString *defaultWebServiceUrl=@"http://webservice.webxml.com.cn/webservices/qqOnlineWebService.asmx";
@@ -32,7 +34,12 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
         defaultWebServiceNameSpace=[space retain];
     }
 }
-
+-(id)init{
+    if (self=[super init]) {
+        self.httpWay=ServiceHttpSoap;
+    }
+    return self;
+}
 #pragma mark -
 #pragma mark 属性重写
 -(NSString*)defaultSoapMesage{
@@ -60,11 +67,24 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     if (_soapMessage&&[_soapMessage length]>0) {
         return _soapMessage;
     }
+    if (self.httpWay==ServiceHttpPost) {
+        return [self paramsTostring];
+    }
     return [self stringSoapMessage:[self soapParams]];
 }
 -(NSDictionary*)headers{
     if (_headers&&[_headers count]>0) {
         return _headers;
+    }
+    if (self.httpWay==ServiceHttpGet) {
+        return [NSDictionary dictionaryWithObjectsAndKeys:[self.webURL host],@"Host", nil];
+    }
+    if (self.httpWay==ServiceHttpPost) {
+        NSMutableDictionary *dic=[NSMutableDictionary dictionary];
+        [dic setValue:[[self webURL] host] forKey:@"Host"];
+        [dic setValue:@"application/x-www-form-urlencoded" forKey:@"Content-Type"];
+        [dic setValue:[NSString stringWithFormat:@"%d",[[self soapMessage] length]] forKey:@"Content-Length"];
+        return dic;
     }
     NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
@@ -75,6 +95,24 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
          [dic setValue:soapAction forKey:@"SOAPAction"];
     }
     return dic;
+}
+- (NSURLRequest*)request{
+    NSMutableURLRequest *req=[NSMutableURLRequest requestWithURL:[self requestURL]];
+    //头部设置
+    [req setAllHTTPHeaderFields:[self headers]];
+    //超时设置
+    [req setTimeoutInterval:60];
+    //访问方式
+    if (self.httpWay==ServiceHttpGet) {
+        [req setHTTPMethod:@"GET"];
+    }else{
+        [req setHTTPMethod:@"POST"];
+    }
+    //body内容
+    if (self.httpWay!=ServiceHttpGet) {
+        [req setHTTPBody:[self.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+    return req;
 }
 #pragma mark -
 #pragma mark 公有方法
@@ -107,6 +145,31 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
 }
 #pragma mark -
 #pragma mark 私有方法
+-(NSURL*)requestURL{
+    if (self.httpWay==ServiceHttpSoap) {
+        return [self webURL];
+    }
+    if (self.httpWay==ServiceHttpGet) {
+        NSString *params=[self paramsTostring];
+        NSString *str=[params length]>0?[NSString stringWithFormat:@"?%@",params]:@"";
+        NSString *result=[NSString stringWithFormat:@"%@/%@%@",[self serviceURL],[self methodName],str];
+        return [NSURL URLWithString:result];
+    }
+    return [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@",[self serviceURL],[self methodName]]];
+}
+-(NSString*)paramsTostring
+{
+    NSArray *arr=[self soapParams];
+    if (arr&&[arr count]>0) {
+        NSMutableArray *results=[NSMutableArray array];
+        for (NSDictionary *item in arr) {
+             NSString *key=[[item allKeys] objectAtIndex:0];
+            [results addObject:[NSString stringWithFormat:@"%@=%@",key,[item objectForKey:key]]];
+        }
+        return [results componentsJoinedByString:@"&"];
+    }
+    return @"";
+}
 -(NSString*)paramsFormatString:(NSArray*)params{
     NSMutableString *xml=[NSMutableString stringWithFormat:@""];
     for (NSDictionary *item in params) {

@@ -9,7 +9,6 @@
 #import "ServiceOperation.h"
 
 @interface ServiceOperation ()
-- (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args;
 - (void)parseStringEncodingFromHeaders:(NSDictionary*)responseHeaders;
 - (void)parseMimeType:(NSString **)mimeType andResponseEncoding:(NSStringEncoding *)stringEncoding fromContentType:(NSString *)contentType;
 @end
@@ -47,7 +46,7 @@
     return self;
 }
 - (id)initWithArgs:(ServiceArgs*)args{
-    return [self initWithRequest:[self requestWithServiceArgs:args]];
+    return [self initWithRequest:[args request]];
 }
 - (id)initWithMethodName:(NSString*)name{
     return [self initWithArgs:[ServiceArgs serviceMethodName:name]];
@@ -214,20 +213,6 @@
     return nil;
 }
 #pragma mark private Methods
-- (NSURLRequest*)requestWithServiceArgs:(ServiceArgs*)args{
-    
-    NSMutableURLRequest *request=[NSMutableURLRequest requestWithURL:args.webURL];
-    request.cachePolicy=NSURLRequestReloadIgnoringCacheData;
-    //头部设置
-    [request setAllHTTPHeaderFields:[args headers]];
-    //超时设置
-    [request setTimeoutInterval:60];
-    //访问方式
-    [request setHTTPMethod:@"POST"];
-    //body内容
-    [request setHTTPBody:[args.soapMessage dataUsingEncoding:NSUTF8StringEncoding]];
-    return request;
-}
 - (void)parseStringEncodingFromHeaders:(NSDictionary*)responseHeaders
 {
 	// Handle response text encoding
