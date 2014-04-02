@@ -23,6 +23,8 @@ typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 @property (nonatomic,readonly) int responseStatusCode;//请求状态
 @property (nonatomic,readonly) NSError *error;//请求失败
 @property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
+@property(nonatomic ,copy) NSString *username;
+@property(nonatomic ,copy) NSString *password;//用户认证请求
 
 + (id)requestWithURL:(NSURL*)url;
 + (id)requestWithRequest:(NSURLRequest*)request;
