@@ -207,7 +207,16 @@
 		[self done];
 	}
 }
-
+//身份认证
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+{
+    if (!self.username || !self.password) {
+        [[challenge sender] useCredential:nil forAuthenticationChallenge:challenge];
+        return;
+    }
+    NSURLCredential *cred = [[[NSURLCredential alloc] initWithUser:self.username password:self.password persistence:NSURLCredentialPersistenceNone] autorelease];
+    [[challenge sender] useCredential:cred forAuthenticationChallenge:challenge];
+}
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection
                   willCacheResponse:(NSCachedURLResponse *)cachedResponse {
     return nil;

@@ -26,6 +26,8 @@
 @property (nonatomic,readonly) NSString *responseString;
 @property (nonatomic,readonly) NSMutableData *responseData;
 @property (nonatomic,assign) NSStringEncoding defaultResponseEncoding;//默认编码
+@property(nonatomic ,copy) NSString *username;
+@property(nonatomic ,copy) NSString *password;//用户认证请求
 
 - (id)initWithURL:(NSURL*)url;
 - (id)initWithRequest:(NSURLRequest*)request;
