@@ -42,6 +42,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     if (self=[super init]) {
         self.httpWay=ServiceHttpSoap12;
         self.timeOutSeconds=60.0;
+        self.defaultEncoding=NSUTF8StringEncoding;
     }
     return self;
 }
@@ -69,6 +70,9 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     return defaultWebServiceNameSpace;
 }
 -(NSString*)bodyMessage{
+    if (self.httpWay==ServiceHttpGet){
+        return @"";
+    }
     if (_bodyMessage&&[_bodyMessage length]>0) {
         return _bodyMessage;
     }
@@ -82,7 +86,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
         return _headers;
     }
     if (self.httpWay==ServiceHttpGet) {
-        return [NSDictionary dictionaryWithObjectsAndKeys:[self.webURL host],@"Host", nil];
+        return [NSMutableDictionary dictionaryWithObjectsAndKeys:[self.webURL host],@"Host", nil];
     }
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[[self webURL] host] forKey:@"Host"];
@@ -95,7 +99,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     if (self.httpWay==ServiceHttpSoap12) {
         [dic setValue:@"application/soap+xml; charset=utf-8" forKey:@"Content-Type"];
     }
-    [dic setValue:[NSString stringWithFormat:@"%d",[[self bodyMessage] length]] forKey:@"Content-Length"];
+    [dic setValue:[NSString stringWithFormat:@"%d",(int)[[self bodyMessage] length]] forKey:@"Content-Length"];
     if (self.httpWay==ServiceHttpSoap1) {
         NSString *soapAction=[self soapAction:[self serviceNameSpace] methodName:[self methodName]];
         if ([soapAction length]>0) {
@@ -114,7 +118,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     [req setHTTPMethod:self.httpWay==ServiceHttpGet?@"GET":@"POST"];
     //body内容
     if (self.httpWay!=ServiceHttpGet) {
-        [req setHTTPBody:[self.bodyMessage dataUsingEncoding:NSUTF8StringEncoding]];
+        [req setHTTPBody:[self.bodyMessage dataUsingEncoding:self.defaultEncoding]];
     }
     return req;
 }

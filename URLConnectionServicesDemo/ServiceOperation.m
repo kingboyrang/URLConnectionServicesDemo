@@ -182,7 +182,7 @@
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     [self parseStringEncodingFromHeaders:[httpResponse allHeaderFields]];//编码处理
     NSInteger statusCode = [httpResponse statusCode];
-    statusCode_=statusCode;
+    statusCode_=(int)statusCode;
     if( statusCode == 200 ) {
         NSUInteger contentSize = [httpResponse expectedContentLength] > 0 ? [httpResponse expectedContentLength] : 0;
         data_ = [[NSMutableData alloc] initWithCapacity:contentSize];

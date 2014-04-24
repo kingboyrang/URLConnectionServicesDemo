@@ -136,7 +136,7 @@
             NSError *error=nil;
             NSData *data=[NSURLConnection sendSynchronousRequest:self.request returningResponse:&response error:&error];
             [self parseStringEncodingFromHeaders:[response allHeaderFields]];//编码处理
-            statusCode_=[response statusCode];
+            statusCode_=(int)[response statusCode];
             error_=[error retain];
             //请求完成
             if (statusCode_!=200) {
@@ -157,6 +157,11 @@
         });
     }
 }
+- (void)success:(SRMFinishBlock)aCompletionBlock failure:(SRMFailedBlock)aFailedBlock{
+    [self setFinishBlock:aCompletionBlock];
+    [self setFailedBlock:aFailedBlock];
+    [self startAsynchronous];
+}
 #pragma mark -
 #pragma mark NSURLConnection delegate Methods
 - (void)connection:(NSURLConnection *)con didReceiveResponse:(NSURLResponse *)response {
@@ -165,7 +170,7 @@
     
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     [self parseStringEncodingFromHeaders:[httpResponse allHeaderFields]];//编码处理
-    statusCode_=[httpResponse statusCode];
+    statusCode_=(int)[httpResponse statusCode];
     
     if (self.sizeBlock) {
         self.sizeBlock([response expectedContentLength]);

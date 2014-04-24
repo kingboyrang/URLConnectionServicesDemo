@@ -21,6 +21,7 @@
 	//==================>使用说明，请查看＝＝＝＝》使用说明v1.0.rtf
    
     _queue=[[ServiceOperationQueue alloc] init];
+
 }
 - (void)didReceiveMemoryWarning
 {
@@ -36,7 +37,8 @@
     ServiceArgs *args=[[[ServiceArgs alloc] init] autorelease];
     args.methodName=@"qqCheckOnline";//要调用的webservice方法
     args.soapParams=params;//传递方法参数
-   
+    NSLog(@"请求头=%@",args.headers);
+    NSLog(@"请求内容=%@",args.bodyMessage);
     ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
     [manager setSuccessBlock:^() {
         if (manager.error) {
@@ -61,6 +63,13 @@
     NSLog(@"请求头=%@",args.headers);
     NSLog(@"请求内容=%@",args.bodyMessage);
     ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
+    /*****************写法1*****************/
+    [manager success:^{
+         NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
+    } failure:^{
+        NSLog(@"异步请求失败，失败原因=%@",manager.error.description);
+    }];
+    /*****************写法2*****************
     [manager setFinishBlock:^() {
         NSLog(@"异步请求成功，请求结果为=%@",manager.responseString);
     }];
@@ -68,6 +77,7 @@
          NSLog(@"异步请求失败，失败原因=%@",manager.error.description);
     }];
     [manager startAsynchronous];//开始异步
+     ***/
 }
 //队列请法
 - (IBAction)buttonQueueClick:(id)sender {
