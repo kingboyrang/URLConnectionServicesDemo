@@ -12,6 +12,7 @@
 //soap 1.2请求方式
 #define defaultSoap12Message @"<?xml version=\"1.0\" encoding=\"utf-8\"?><soap12:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap12=\"http://www.w3.org/2003/05/soap-envelope\"><soap12:Header>%@</soap12:Header><soap12:Body>%@</soap12:Body></soap12:Envelope>"
 @interface ServiceArgs()
+@property (nonatomic,readonly) NSString *hostName;
 -(NSString*)stringSoapMessage:(NSArray*)params;
 -(NSString*)paramsFormatString:(NSArray*)params;
 -(NSString*)soapAction:(NSString*)namespace methodName:(NSString*)methodName;
@@ -81,6 +82,13 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
     }
     return [self stringSoapMessage:[self soapParams]];
 }
+- (NSString*)hostName{
+    NSURL *webURL=[self requestURL];
+    if (webURL.port) {
+        return [NSString stringWithFormat:@"%@:%d",webURL.host,[webURL.port intValue]];
+    }
+    return [webURL host];
+}
 -(NSDictionary*)headers{
     if (_headers&&[_headers count]>0) {
         return _headers;
@@ -89,7 +97,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
         return [NSMutableDictionary dictionaryWithObjectsAndKeys:[self.webURL host],@"Host", nil];
     }
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
-    [dic setValue:[[self webURL] host] forKey:@"Host"];
+    [dic setValue:[self hostName] forKey:@"Host"];
     if (self.httpWay==ServiceHttpPost) {
         [dic setValue:@"application/x-www-form-urlencoded" forKey:@"Content-Type"];
     }

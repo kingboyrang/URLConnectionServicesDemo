@@ -21,7 +21,6 @@
 	//==================>使用说明，请查看＝＝＝＝》使用说明v1.0.rtf
    
     _queue=[[ServiceOperationQueue alloc] init];
-
 }
 - (void)didReceiveMemoryWarning
 {
