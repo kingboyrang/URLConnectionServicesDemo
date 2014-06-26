@@ -58,7 +58,7 @@
     args.methodName=@"qqCheckOnline";//要调用的webservice方法
     args.soapParams=params;//传递方法参数
     //设置请求方式
-    //args.httpWay=ServiceHttpPost;
+    //args.httpWay=ServiceHttpPost;//get,post,soap
     NSLog(@"请求头=%@",args.headers);
     NSLog(@"请求内容=%@",args.bodyMessage);
     ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
