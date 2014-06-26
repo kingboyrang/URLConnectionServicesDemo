@@ -94,7 +94,7 @@ static NSString *defaultWebServiceNameSpace=@"http://WebXml.com.cn/";
         return _headers;
     }
     if (self.httpWay==ServiceHttpGet) {
-        return [NSMutableDictionary dictionaryWithObjectsAndKeys:[self.webURL host],@"Host", nil];
+        return [NSMutableDictionary dictionaryWithObjectsAndKeys:[self hostName],@"Host", nil];
     }
     NSMutableDictionary *dic=[NSMutableDictionary dictionary];
     [dic setValue:[self hostName] forKey:@"Host"];
