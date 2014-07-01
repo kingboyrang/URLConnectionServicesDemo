@@ -36,10 +36,12 @@ typedef void (^SRMProgressBlock)(long long total,long long size,float rate);
 - (id)initWithName:(NSString*)methodName;//无参数的webservice请求
 - (void)setFinishBlock:(SRMFinishBlock)aCompletionBlock;
 - (void)setFailedBlock:(SRMFailedBlock)aFailedBlock;
-- (void)setSuccessBlock:(SRMSuccessBlock)aSuccessBlock;
+- (void)setSuccessBlock:(SRMSuccessBlock)aSuccessBlock;//同步请求设置block
 - (void)setDownloadSizeIncrementedBlock:(SRMSizeBlock)aDownloadSizeIncrementedBlock;
 - (void)setProgressBlock:(SRMProgressBlock)aBytesReceivedBlock;
-//同步请求
+//真同步
+- (NSString*)synchronousWithError:(NSError**)error;
+//同步请求(注：伪同步，使用了gcd的异步)
 - (void)startSynchronous;
 //开始异步请求
 - (void)startAsynchronous;

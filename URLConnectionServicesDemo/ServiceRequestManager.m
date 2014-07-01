@@ -150,12 +150,41 @@
             }else{
                 [responseData_ appendData:data];
             }
+            [self hideNetworkActivityIndicator];
             if (self.successBlock) {
-                [self hideNetworkActivityIndicator];
                 self.successBlock();
             }
         });
     }
+}
+- (NSString*)synchronousWithError:(NSError**)err{
+    [responseData_ setLength:0];
+    if (self.request) {
+        [self clearAndDelegate];//取消前一次请求
+        [self showNetworkActivityIndicator];
+        
+        NSHTTPURLResponse *response=nil;
+        NSError *error=nil;
+        NSData *data=[NSURLConnection sendSynchronousRequest:self.request returningResponse:&response error:&error];
+        [self parseStringEncodingFromHeaders:[response allHeaderFields]];//编码处理
+        statusCode_=(int)[response statusCode];
+        error_=[error retain];
+        //请求完成
+        if (statusCode_!=200) {
+            [responseData_ release],responseData_=nil;
+            
+            NSString* statusError  = [NSString stringWithFormat:NSLocalizedString(@"HTTP Error: %ld", nil), statusCode_];
+            NSDictionary* userInfo = [NSDictionary dictionaryWithObject:statusError forKey:NSLocalizedDescriptionKey];
+            error_ = [[NSError alloc] initWithDomain:@"ServiceRequestManager"
+                                                code:statusCode_
+                                            userInfo:userInfo];
+        }else{
+            [responseData_ appendData:data];
+        }
+        [self hideNetworkActivityIndicator];
+    }
+    *err=error_;
+    return [self responseString];
 }
 - (void)success:(SRMFinishBlock)aCompletionBlock failure:(SRMFailedBlock)aFailedBlock{
     [self setFinishBlock:aCompletionBlock];
