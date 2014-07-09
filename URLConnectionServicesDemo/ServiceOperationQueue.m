@@ -19,7 +19,6 @@
     if (items_) {
         [items_ release],items_=nil;
     }
-    [self removeObserver:self forKeyPath:@"operations"];
     [self cancelAllOperations];
     if (self.operations&&[self.operations count]>0) {
         for (id op in self.operations) {
