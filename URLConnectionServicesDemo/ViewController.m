@@ -18,6 +18,41 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+   
+    
+    NSMutableArray *params=[NSMutableArray array];
+    [params addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"",@"loginData", nil]];
+    
+    ServiceArgs *args=[[ServiceArgs alloc] init];
+    args.methodName=@"CheckLogin";//要调用的方法名
+    args.soapParams=params;//传递的参数
+    
+    ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
+    [manager success:^{//登陆成功
+        NSLog(@"登陆成功，返回的值为=%@",manager.responseString);
+        
+        /***登陆成功后调用SvcCall的方法代码如下
+        NSMutableArray *params1=[NSMutableArray array];
+        [params1 addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"",@"funCode", nil]];
+        [params1 addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"",@"header", nil]];
+        [params1 addObject:[NSDictionary dictionaryWithObjectsAndKeys:@"",@"data", nil]];
+        
+        ServiceArgs *args=[[ServiceArgs alloc] init];
+        args.methodName=@"SvcCall";//要调用的方法名
+        args.soapParams=params1;//传递的参数
+        ServiceRequestManager *request=[ServiceRequestManager requestWithArgs:args];
+        [request success:^{
+            NSLog(@"成功=%@",request.responseString);
+        } failure:^{
+             NSLog(@"error=%@",request.error.description);
+        }];
+         ***/
+        
+    } failure:^{
+        NSLog(@"登陆失败!");
+    }];
+    
 	//==================>使用说明，请查看＝＝＝＝》使用说明v1.0.rtf
    
     _queue=[[ServiceOperationQueue alloc] init];
@@ -122,11 +157,14 @@
     }];
     //所有的请求完成就会执行这里
     [_queue setCompleteBlock:^{
+        NSLog(@"all finished!");
+        /***
          for (ServiceOperation *operation in _queue.items) {
              NSDictionary *dic=[operation userInfo];
              NSLog(@"name=%@",[dic objectForKey:@"name"]);
              NSLog(@"请求返回的结果=%@",operation.responseString);
          }
+         ***/
     }];
 }
 //下载图片==>注图太小了下载过快，看不出什么效果

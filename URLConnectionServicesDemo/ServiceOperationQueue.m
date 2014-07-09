@@ -37,8 +37,6 @@
         self.showNetworkActivityIndicator=YES;
         self.maxConcurrentOperationCount=10;
         items_=[[NSMutableArray array] retain];
-        //用于判断队列请求是否完成
-        [self addObserver:self forKeyPath:@"operations" options:0 context:NULL];
     }
     return self;
 }
@@ -53,6 +51,7 @@
         [operation addObserver:self forKeyPath:@"isFinished" options:NSKeyValueObservingOptionNew context:NULL];
     }
     [super addOperation:op];
+    operTotal_=[self.operations count];
 }
 - (void)setFinishBlock:(SOQFinishBlock)afinishBlock{
     if (_finishBlock!=afinishBlock) {
@@ -90,41 +89,29 @@
                         change:(NSDictionary *)change
                        context:(void *)context
 {
-    if (object==self) {
-        if ([keyPath isEqualToString:@"operations"])
-        {
-            if (self.showNetworkActivityIndicator) {
-                [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.operations.count>0)];
-            }
-            //表示所有请求完成
-            if (0 == self.operations.count)
-            {
-                
-                [self setSuspended:YES];
-                [self willChangeValueForKey:@"isFinished"];
-                finished_  = YES;
-                [self didChangeValueForKey:@"isFinished"];
-                if (self.completeBlock) {
-                    self.completeBlock();
-                }
-            }
+    if (self.showNetworkActivityIndicator) {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:(self.operations.count>0)];
+    }
+    //表示其中一个请求完成
+    if ([object isKindOfClass:[ServiceOperation class]]&&[keyPath isEqualToString:@"isFinished"]) {
+        ServiceOperation *operation=(ServiceOperation*)object;
+        [items_ addObject:operation];
+        if (self.finishBlock) {
+            self.finishBlock(operation);
         }
-        else
-        {
-            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+        [operation removeObserver:self forKeyPath:@"isFinished"];
+        //表示所有请求完成
+        if (operTotal_==[items_ count]) {
+            [self setSuspended:YES];
+            [self willChangeValueForKey:@"isFinished"];
+            finished_  = YES;
+            [self didChangeValueForKey:@"isFinished"];
+            if (self.completeBlock) {
+                self.completeBlock();
+            }
         }
     }else{
-        //表示其中一个请求完成
-        if ([object isKindOfClass:[ServiceOperation class]]&&[keyPath isEqualToString:@"isFinished"]) {
-            ServiceOperation *operation=(ServiceOperation*)object;
-            [items_ addObject:operation];
-            if (self.finishBlock) {
-                self.finishBlock(operation);
-            }
-            [operation removeObserver:self forKeyPath:@"isFinished"];
-        }else{
-            [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
-        }
+        [super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
     }
 }
 @end

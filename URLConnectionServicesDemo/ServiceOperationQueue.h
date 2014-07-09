@@ -15,6 +15,7 @@ typedef void (^SOQCompleteBlock)();
 @interface ServiceOperationQueue : NSOperationQueue{
    BOOL finished_;
    NSMutableArray *items_;
+    NSInteger operTotal_;
 }
 @property (nonatomic,assign) BOOL showNetworkActivityIndicator;//是否在状态栏显示网络请求中
 @property (nonatomic,readonly) NSArray *items;//保存请求完成后的线程
