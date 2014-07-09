@@ -37,6 +37,7 @@
         self.showNetworkActivityIndicator=YES;
         self.maxConcurrentOperationCount=10;
         items_=[[NSMutableArray array] retain];
+        finished_=NO;
     }
     return self;
 }
