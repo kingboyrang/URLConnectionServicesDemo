@@ -254,14 +254,37 @@
     [self clearAndDelegate];
 }
 //身份认证
+- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace
+{
+    if ([self.request.URL.absoluteString hasPrefix:@"https"]) {
+        return [protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust];
+    }
+    return NO;
+}
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
 {
+    /***
     if (!self.username || !self.password) {
         [[challenge sender] useCredential:nil forAuthenticationChallenge:challenge];
         return;
     }
-    NSURLCredential *cred = [[[NSURLCredential alloc] initWithUser:self.username password:self.password persistence:NSURLCredentialPersistenceNone] autorelease];
-    [[challenge sender] useCredential:cred forAuthenticationChallenge:challenge];
+     ***/
+    
+    if (self.username&&self.password&&[self.username length]>0&&[self.password length]>0) {
+        NSURLCredential *cred = [[[NSURLCredential alloc] initWithUser:self.username password:self.password persistence:NSURLCredentialPersistenceNone] autorelease];
+        [[challenge sender] useCredential:cred forAuthenticationChallenge:challenge];
+    }else{
+        if ([self.request.URL.absoluteString hasPrefix:@"https"]) {
+            if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]){
+                
+                [[challenge sender]  useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+                
+                [[challenge sender]  continueWithoutCredentialForAuthenticationChallenge: challenge];
+                
+            }
+        }
+    }
+    
 }
 #pragma mark -private Methods
 - (void)clearAndDelegate{
