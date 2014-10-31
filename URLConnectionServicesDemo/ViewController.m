@@ -22,16 +22,6 @@
    
     _queue=[[ServiceOperationQueue alloc] init];
     
-    ServiceArgs *args=[[ServiceArgs alloc] init];
-    args.serviceURL=@"https://data.hsinchu.gov.tw/hchgopendataadmin/webservice.asmx";
-    args.serviceNameSpace=@"http://tempuri.org/";
-    args.methodName=@"GetAppData";
-    ServiceRequestManager *manager=[ServiceRequestManager requestWithArgs:args];
-    [manager success:^{
-        NSLog(@"xml=%@",manager.responseString);
-    } failure:^{
-        NSLog(@"err=%@",manager.error.description);
-    }];
 }
 - (void)didReceiveMemoryWarning
 {
